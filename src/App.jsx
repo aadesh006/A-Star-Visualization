@@ -257,7 +257,6 @@ export default function App() {
         const dFrame = dijkstraResult.frames[queue.tick];
         const gFrame = greedyResult?.frames[queue.tick];
 
-        // Shallow-clone only the cells that are changing to avoid full grid rebuild
         const newGrid = queue.animGrid.map(r => r.map(n => ({
           ...n,
           astar:    { ...n.astar },
@@ -287,7 +286,8 @@ export default function App() {
         if (greedyResult) setGreedyStats({ nodesExplored: Math.min(queue.gVisited, queue.gVisitTotal), pathLength: 0, found: false });
 
       } else {
-        // Transition to path animation phase
+        // Visit phase done — flip to path phase and immediately run first path frame
+        // so STEP button doesn't appear to do nothing at the boundary
         queue.phase = 'path';
         queue.tick  = 0;
         queue.maxPath = Math.max(
@@ -295,7 +295,10 @@ export default function App() {
           queue.dijkstraResult.pathFrames.length,
           queue.greedyResult?.pathFrames.length ?? 0
         );
+        // Recurse once to consume the first path frame immediately
+        advanceOneFrame(queue);
       }
+    } else if (queue.phase === 'path') {
     } else if (queue.phase === 'path') {
       const { astarResult, dijkstraResult, greedyResult } = queue;
       if (queue.tick < queue.maxPath) {

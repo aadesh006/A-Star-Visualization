@@ -66,42 +66,42 @@
 /* All three overlap */
 .visitedAll { background-color: rgba(20, 20, 20, 0.28); }
 
-/* ─── Path States ───────────────────────────────────────────────────────────── */
+/* ─── Path States — bold, outlined, impossible to miss ─────────────────────── */
 
-/* A* — electric blue, bright cyan top stripe */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  border-color: #1d4ed8;
-  border-top: 3px solid #93c5fd;
+  outline: 2px solid #93c5fd;
+  outline-offset: -2px;
+  border-color: #1e40af;
   z-index: 2;
-  animation: pathStamp 0.18s ease forwards;
+  animation: pathStamp 0.2s ease forwards;
 }
 
-/* Dijkstra — vivid orange, yellow top stripe */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  border-color: #c2410c;
-  border-top: 3px solid #fed7aa;
+  outline: 2px solid #fed7aa;
+  outline-offset: -2px;
+  border-color: #9a3412;
   z-index: 2;
-  animation: pathStamp 0.18s ease forwards;
+  animation: pathStamp 0.2s ease forwards;
 }
 
-/* Greedy — vivid violet, lavender top stripe */
 .pathGreedy {
   background-color: var(--greedy-path) !important;
-  border-color: #5b21b6;
-  border-top: 3px solid #ddd6fe;
+  outline: 2px solid #ddd6fe;
+  outline-offset: -2px;
+  border-color: #4c1d95;
   z-index: 2;
-  animation: pathStamp 0.18s ease forwards;
+  animation: pathStamp 0.2s ease forwards;
 }
 
-/* Shared by 2+ — bright yellow, stands out from all three algo colors */
 .pathShared {
-  background-color: #d97706 !important;
-  border-color: #b45309;
-  border-top: 3px solid #fef08a;
+  background-color: #b45309 !important;
+  outline: 2px solid #fef08a;
+  outline-offset: -2px;
+  border-color: #92400e;
   z-index: 2;
-  animation: pathStamp 0.18s ease forwards;
+  animation: pathStamp 0.2s ease forwards;
 }
 
 /* ─── Animations ────────────────────────────────────────────────────────────── */
