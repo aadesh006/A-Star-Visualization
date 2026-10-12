@@ -7,7 +7,7 @@
   user-select: none;
 }
 
-/* ─── Resize Handle — thin black bar, turns red on hover ───────────────────── */
+/* ─── Resize Handle ─────────────────────────────────────────────────────────── */
 .resizeHandle {
   width: 3px;
   min-width: 3px;
@@ -31,18 +31,29 @@
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  min-height: 0; /* critical — lets flex child shrink below content size */
 }
 
-/* ─── Grid area ─────────────────────────────────────────────────────────────── */
+/* ─── Grid area — fills all remaining height after the stats bar ────────────── */
 .gridArea {
   flex: 1;
-  padding: 20px;
+  min-height: 0;
+  padding: 16px;
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   background: var(--bg);
 }
 
+/* ─── Grid wrapper sizing ───────────────────────────────────────────────────────
+   Grid is 2:1 (56 cols × 28 rows). Constrain by whichever axis is smaller.
+   - Width constrained: width=100%, height follows aspect-ratio
+   - Height constrained: height=100%, width capped at 2× the height           */
 .gridArea > * {
   width: 100%;
+  max-height: calc(100% );
+  /* If height is the bottleneck, this caps the width so the aspect-ratio
+     on the wrapper kicks in and shrinks it to fit                           */
+  max-width: min(100%, calc((100vh - 120px) * 2));
 }

@@ -5,6 +5,12 @@
   overflow: hidden;
   background: var(--node-empty);
   user-select: none;
+  /* 56 cols : 28 rows = 2:1 aspect ratio.
+     Combined with max-height/max-width in the parent, this ensures the grid
+     always fits within the viewport without overflowing either axis.          */
+  aspect-ratio: 2 / 1;
+  width: 100%;
+  max-height: 100%;
 }
 
 .mapOverlay { display: none; }
