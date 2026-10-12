@@ -1,126 +1,73 @@
-/* ─── Stats Bar — benchmark table aesthetic ─────────────────────────────────── */
+/* ─── Stats Bar ─────────────────────────────────────────────────────────────── */
 .bar {
   border-top: 2px solid var(--border);
   background: var(--bg-panel);
   font-family: var(--font-mono);
+  flex-shrink: 0;
 }
 
-/* ─── Header Row ────────────────────────────────────────────────────────────── */
-.headerRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  border-bottom: 1px solid var(--border);
-  background: var(--fg);         /* inverted header row */
-}
-
-.headerCell {
-  padding: 6px 16px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--bg);
-  border-right: 1px solid #333;
-}
-
-.headerCell:last-child {
-  border-right: none;
-}
-
-/* Color-coded algorithm column headers */
-.astarCol.headerCell {
-  color: #7dd3fc;               /* light blue on black */
-}
-
-.dijkstraCol.headerCell {
-  color: #fca5a5;               /* light red on black */
-}
-
-/* ─── Data Rows ─────────────────────────────────────────────────────────────── */
+/* --algo-cols is set inline (3 or 4 depending on showGreedy) */
+.headerRow,
 .row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  /* metric label + N algo columns + diff column */
+  grid-template-columns: 1.2fr repeat(var(--algo-cols, 3), 1fr) 1fr;
   border-bottom: 1px solid var(--border-light);
 }
 
-.row:last-child {
-  border-bottom: none;
-}
+.row:last-child { border-bottom: none; }
 
+/* ─── Header ────────────────────────────────────────────────────────────────── */
+.headerRow { background: var(--fg); border-bottom: 1px solid var(--border); }
+
+.headerCell {
+  padding: 5px 12px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--bg);
+  border-right: 1px solid #333;
+}
+.headerCell:last-child { border-right: none; }
+
+.astarHeader    { color: #7dd3fc; }
+.dijkstraHeader { color: #fca5a5; }
+.greedyHeader   { color: #86efac; }
+
+/* ─── Row cells ─────────────────────────────────────────────────────────────── */
 .rowLabel {
-  padding: 8px 16px;
-  font-size: 10px;
-  color: var(--fg-muted);
-  letter-spacing: 0.04em;
+  padding: 7px 12px;
+  font-size: 10px; color: var(--fg-muted); letter-spacing: 0.04em;
   border-right: 1px solid var(--border-light);
   background: var(--bg-card);
 }
 
 .rowVal {
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--fg);
+  padding: 7px 12px;
+  font-size: 13px; font-weight: 700; color: var(--fg);
   letter-spacing: -0.01em;
   border-right: 1px solid var(--border-light);
 }
 
+/* Subtle per-algorithm column tints */
+.astarVal    { background: rgba(0,  64, 184, 0.06); }
+.dijkstraVal { background: rgba(204, 24,  0, 0.06); }
+.greedyVal   { background: rgba(0,  140, 60, 0.06); }
+
 .rowDiff {
-  padding: 8px 16px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--fg-muted);
-  display: flex;
-  align-items: center;
+  padding: 7px 12px;
+  font-size: 11px; font-weight: 600; color: var(--fg-muted);
+  display: flex; align-items: center;
 }
 
-/* ─── Column tinting — subtle background to differentiate algo columns ──────── */
-.astarCol {
-  background: rgba(0, 64, 184, 0.07);
-}
-
-.dijkstraCol {
-  background: rgba(204, 24, 0, 0.07);
-}
-
-/* ─── Live counter animation while running ──────────────────────────────────── */
-.live {
-  animation: tick 0.15s ease;
-  color: var(--fg);
-}
-
-@keyframes tick {
-  0%   { opacity: 0.5; }
-  100% { opacity: 1;   }
-}
+/* ─── Live counter animation ────────────────────────────────────────────────── */
+.live { animation: tick 0.12s ease; }
+@keyframes tick { 0% { opacity: 0.5; } 100% { opacity: 1; } }
 
 /* ─── Status badges ─────────────────────────────────────────────────────────── */
-.running {
-  color: var(--fg-muted);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-}
+.running  { color: var(--fg-muted); font-size: 10px; letter-spacing: 0.1em; }
+.found    { color: #0050c8;         font-size: 10px; letter-spacing: 0.08em; }
+.notFound { color: var(--red);      font-size: 10px; letter-spacing: 0.08em; }
 
-.found {
-  color: #0050c8;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-}
-
-.notFound {
-  color: var(--red);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-}
-
-/* ─── Diff column values ────────────────────────────────────────────────────── */
-.better {
-  color: #0050c8;               /* blue = A* wins */
-}
-
-.worse {
-  color: var(--red);            /* red = A* lost quality */
-}
-
-.neutral {
-  color: var(--fg-muted);
-}
+/* ─── Diff badges ───────────────────────────────────────────────────────────── */
+.better  { color: #0050c8; }
+.worse   { color: var(--red); }
+.neutral { color: var(--fg-muted); }

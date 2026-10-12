@@ -1,30 +1,50 @@
-// ─── Grid Utilities ────────────────────────────────────────────────────────────
+// ─── Grid Constants ────────────────────────────────────────────────────────────
 
 export const ROWS = 28;
 export const COLS = 56;
 
-// Node types used as grid cell state identifiers
+// Node type identifiers — wall blocks movement, terrain types add movement cost
 export const NODE_TYPES = {
-  EMPTY:    'empty',
-  WALL:     'wall',
-  START:    'start',
-  END:      'end',
+  EMPTY:  'empty',
+  WALL:   'wall',
+  SAND:   'sand',   // cost ×3 — slows movement significantly
+  WATER:  'water',  // cost ×5 — very expensive to cross
+  START:  'start',
+  END:    'end',
 };
 
-// All valid heuristic functions for A*
+// Terrain traversal costs — higher = harder to cross
+// Dijkstra and A* both respect these; Greedy ignores actual costs (heuristic only)
+export const TERRAIN_COSTS = {
+  [NODE_TYPES.EMPTY]: 1,
+  [NODE_TYPES.SAND]:  3,
+  [NODE_TYPES.WATER]: 5,
+  [NODE_TYPES.START]: 1,
+  [NODE_TYPES.END]:   1,
+};
+
+// Terrain types the user can paint onto the grid (excludes start/end/wall)
+export const TERRAIN_TYPES = [
+  { id: NODE_TYPES.EMPTY, label: 'EMPTY', cost: 1  },
+  { id: NODE_TYPES.SAND,  label: 'SAND',  cost: 3  },
+  { id: NODE_TYPES.WATER, label: 'WATER', cost: 5  },
+];
+
+// All valid heuristic functions for A* and Greedy
 export const HEURISTICS = {
-  manhattan:  'Manhattan',
-  euclidean:  'Euclidean',
-  chebyshev:  'Chebyshev',
-  octile:     'Octile',
-  zero:       'Zero (→ Dijkstra)',
+  manhattan: 'Manhattan',
+  euclidean: 'Euclidean',
+  chebyshev: 'Chebyshev',
+  octile:    'Octile',
+  zero:      'Zero (→ Dijkstra)',
 };
 
-/**
- * Creates a fresh 2D grid of node objects.
- * Each node tracks its position, type, and algorithm-specific state.
- */
-export function createGrid(startPos = { row: 10, col: 10 }, endPos = { row: 10, col: 45 }) {
+// ─── Grid Factory ──────────────────────────────────────────────────────────────
+
+export function createGrid(
+  startPos = { row: Math.floor(ROWS / 2), col: Math.floor(COLS * 0.15) },
+  endPos   = { row: Math.floor(ROWS / 2), col: Math.floor(COLS * 0.85) }
+) {
   return Array.from({ length: ROWS }, (_, row) =>
     Array.from({ length: COLS }, (_, col) => createNode(row, col, startPos, endPos))
   );
@@ -37,67 +57,69 @@ function createNode(row, col, startPos, endPos) {
     row,
     col,
     type: isStart ? NODE_TYPES.START : isEnd ? NODE_TYPES.END : NODE_TYPES.EMPTY,
-    // A* state
-    astar: { visited: false, inFrontier: false, inPath: false, g: Infinity, f: Infinity },
-    // Dijkstra state
+    // Per-algorithm visual state — tracked independently so both run simultaneously
+    astar:    { visited: false, inFrontier: false, inPath: false, g: Infinity, f: Infinity },
     dijkstra: { visited: false, inFrontier: false, inPath: false, g: Infinity },
+    greedy:   { visited: false, inFrontier: false, inPath: false, h: Infinity },
   };
 }
 
-/**
- * Deep clone a grid — needed before each algorithm run to avoid mutating
- * the display grid mid-animation.
- */
+// Deep clone without sharing nested algorithm state objects
 export function cloneGrid(grid) {
   return grid.map(row => row.map(node => ({
     ...node,
     astar:    { ...node.astar },
     dijkstra: { ...node.dijkstra },
+    greedy:   { ...node.greedy },
   })));
 }
 
-// ─── Heuristic Functions ───────────────────────────────────────────────────────
+// ─── Heuristics ────────────────────────────────────────────────────────────────
 
 const heuristics = {
-  manhattan:  (r1, c1, r2, c2) => Math.abs(r1 - r2) + Math.abs(c1 - c2),
-  euclidean:  (r1, c1, r2, c2) => Math.sqrt((r1 - r2) ** 2 + (c1 - c2) ** 2),
-  chebyshev:  (r1, c1, r2, c2) => Math.max(Math.abs(r1 - r2), Math.abs(c1 - c2)),
-  // Octile distance is the most accurate for 8-directional grids
-  octile:     (r1, c1, r2, c2) => {
+  manhattan: (r1, c1, r2, c2) => Math.abs(r1 - r2) + Math.abs(c1 - c2),
+  euclidean: (r1, c1, r2, c2) => Math.sqrt((r1 - r2) ** 2 + (c1 - c2) ** 2),
+  chebyshev: (r1, c1, r2, c2) => Math.max(Math.abs(r1 - r2), Math.abs(c1 - c2)),
+  // Octile is the most accurate heuristic for 8-directional movement with √2 diagonal cost
+  octile:    (r1, c1, r2, c2) => {
     const dr = Math.abs(r1 - r2), dc = Math.abs(c1 - c2);
     return Math.max(dr, dc) + (Math.SQRT2 - 1) * Math.min(dr, dc);
   },
-  zero:       () => 0, // Zero heuristic makes A* behave exactly like Dijkstra
+  zero: () => 0,
 };
 
 // ─── Neighbor Discovery ────────────────────────────────────────────────────────
 
 /**
- * Returns all 8-directional neighbors (diagonals included) that are walkable.
- * Diagonal moves cost √2, cardinal moves cost 1.
+ * Returns walkable 8-directional neighbors with their movement cost.
+ * Terrain type of the DESTINATION cell determines the cost (entering cost model).
+ * Diagonal moves also pay √2 × terrain cost.
  */
 function getNeighbors(grid, row, col) {
   const neighbors = [];
   const dirs = [
-    [-1,  0, 1],       // up
-    [ 1,  0, 1],       // down
-    [ 0, -1, 1],       // left
-    [ 0,  1, 1],       // right
-    [-1, -1, Math.SQRT2], // diagonals
-    [-1,  1, Math.SQRT2],
-    [ 1, -1, Math.SQRT2],
-    [ 1,  1, Math.SQRT2],
+    [-1,  0, 1],           // N
+    [ 1,  0, 1],           // S
+    [ 0, -1, 1],           // W
+    [ 0,  1, 1],           // E
+    [-1, -1, Math.SQRT2],  // NW
+    [-1,  1, Math.SQRT2],  // NE
+    [ 1, -1, Math.SQRT2],  // SW
+    [ 1,  1, Math.SQRT2],  // SE
   ];
-  for (const [dr, dc, cost] of dirs) {
+  for (const [dr, dc, baseCost] of dirs) {
     const r = row + dr, c = col + dc;
-    if (r >= 0 && r < ROWS && c >= 0 && c < COLS && grid[r][c].type !== NODE_TYPES.WALL) {
-      neighbors.push({ node: grid[r][c], cost });
-    }
+    if (r < 0 || r >= ROWS || c < 0 || c >= COLS) continue;
+    const neighbor = grid[r][c];
+    if (neighbor.type === NODE_TYPES.WALL) continue;
+    // Multiply base movement cost by the terrain multiplier of the destination cell
+    const terrainCost = TERRAIN_COSTS[neighbor.type] ?? 1;
+    neighbors.push({ node: neighbor, cost: baseCost * terrainCost });
   }
   return neighbors;
 }
 
-// ─── Priority Queue (Min-Heap) ─────────────────────────────────────────────────
+// ─── Min-Heap Priority Queue ───────────────────────────────────────────────────
 
 class MinHeap {
   constructor() { this.heap = []; }
@@ -108,7 +130,7 @@ class MinHeap {
   }
 
   pop() {
-    const top = this.heap[0];
+    const top  = this.heap[0];
     const last = this.heap.pop();
     if (this.heap.length > 0) {
       this.heap[0] = last;
@@ -121,59 +143,52 @@ class MinHeap {
 
   _bubbleUp(i) {
     while (i > 0) {
-      const parent = (i - 1) >> 1;
-      if (this.heap[parent].priority <= this.heap[i].priority) break;
-      [this.heap[parent], this.heap[i]] = [this.heap[i], this.heap[parent]];
-      i = parent;
+      const p = (i - 1) >> 1;
+      if (this.heap[p].priority <= this.heap[i].priority) break;
+      [this.heap[p], this.heap[i]] = [this.heap[i], this.heap[p]];
+      i = p;
     }
   }
 
   _sinkDown(i) {
     const n = this.heap.length;
     while (true) {
-      let smallest = i;
+      let s = i;
       const l = 2 * i + 1, r = 2 * i + 2;
-      if (l < n && this.heap[l].priority < this.heap[smallest].priority) smallest = l;
-      if (r < n && this.heap[r].priority < this.heap[smallest].priority) smallest = r;
-      if (smallest === i) break;
-      [this.heap[smallest], this.heap[i]] = [this.heap[i], this.heap[smallest]];
-      i = smallest;
+      if (l < n && this.heap[l].priority < this.heap[s].priority) s = l;
+      if (r < n && this.heap[r].priority < this.heap[s].priority) s = r;
+      if (s === i) break;
+      [this.heap[s], this.heap[i]] = [this.heap[i], this.heap[s]];
+      i = s;
     }
   }
 }
 
-// ─── A* Algorithm ─────────────────────────────────────────────────────────────
+// ─── A* ───────────────────────────────────────────────────────────────────────
 
 /**
- * Runs A* and returns a step-by-step animation sequence.
- * Each frame is a snapshot of which nodes changed state so we can
- * animate incrementally rather than repainting the entire grid each tick.
+ * A* with configurable heuristic and weight.
+ * Each visit frame carries the node's computed g and f scores so the
+ * tooltip system can show them on hover without re-running the algorithm.
  *
- * @param {Array}  grid       - The current grid (walls, start, end positions)
- * @param {{row,col}} start   - Start node position
- * @param {{row,col}} end     - End node position
- * @param {string} heuristic  - Key from HEURISTICS
- * @param {number} weight     - Heuristic weight (1 = standard A*, >1 = weighted)
- * @returns {{ frames: Array, stats: Object }}
+ * weight = 1  → standard A* (optimal)
+ * weight > 1  → Weighted A* (faster, potentially suboptimal)
+ * weight = 0  → degrades to Dijkstra
  */
 export function runAStar(grid, start, end, heuristic = 'manhattan', weight = 1) {
-  const h = heuristics[heuristic] ?? heuristics.manhattan;
-  const frames = [];
-
-  // cameFrom lets us reconstruct the path at the end
+  const h        = heuristics[heuristic] ?? heuristics.manhattan;
+  const frames   = [];
   const cameFrom = new Map();
   const gScore   = new Map();
+  const fScore   = new Map(); // stored so frames can carry f values for tooltips
   const nodeKey  = (r, c) => `${r},${c}`;
-
   const startKey = nodeKey(start.row, start.col);
-  gScore.set(startKey, 0);
 
-  const open = new MinHeap();
-  open.push({
-    priority: h(start.row, start.col, end.row, end.col) * weight,
-    row: start.row,
-    col: start.col,
-  });
+  gScore.set(startKey, 0);
+  fScore.set(startKey, h(start.row, start.col, end.row, end.col) * weight);
+
+  const open   = new MinHeap();
+  open.push({ priority: fScore.get(startKey), row: start.row, col: start.col });
 
   const inOpen  = new Set([startKey]);
   const closed  = new Set();
@@ -182,26 +197,29 @@ export function runAStar(grid, start, end, heuristic = 'manhattan', weight = 1) 
   while (open.size > 0) {
     const { row, col } = open.pop();
     const key = nodeKey(row, col);
-
     if (closed.has(key)) continue;
+
     closed.add(key);
     inOpen.delete(key);
     nodesExplored++;
 
-    // Record visited frame for animation
-    frames.push({ type: 'visit', row, col });
+    // Carry g/f values in the frame so the Grid tooltip can display them
+    frames.push({
+      type: 'visit', row, col,
+      g: gScore.get(key),
+      f: fScore.get(key),
+    });
 
-    // Reached the goal — reconstruct path
     if (row === end.row && col === end.col) {
       const path = reconstructPath(cameFrom, end, nodeKey);
       return {
         frames,
         pathFrames: path.map(([r, c]) => ({ type: 'path', row: r, col: c })),
-        stats: {
-          nodesExplored,
-          pathLength: path.length,
-          found: true,
-        },
+        // scoreMap lets the grid render stored g/f values on every cell after the run
+        scoreMap: Object.fromEntries(
+          [...gScore.entries()].map(([k, g]) => [k, { g, f: fScore.get(k) ?? Infinity }])
+        ),
+        stats: { nodesExplored, pathLength: path.length, found: true },
       };
     }
 
@@ -214,62 +232,65 @@ export function runAStar(grid, start, end, heuristic = 'manhattan', weight = 1) 
         cameFrom.set(nKey, [row, col]);
         gScore.set(nKey, tentativeG);
         const f = tentativeG + h(node.row, node.col, end.row, end.col) * weight;
+        fScore.set(nKey, f);
         open.push({ priority: f, row: node.row, col: node.col });
 
         if (!inOpen.has(nKey)) {
           inOpen.add(nKey);
-          frames.push({ type: 'frontier', row: node.row, col: node.col });
+          frames.push({ type: 'frontier', row: node.row, col: node.col, g: tentativeG, f });
         }
       }
     }
   }
 
-  // No path found
-  return { frames, pathFrames: [], stats: { nodesExplored, pathLength: 0, found: false } };
+  return {
+    frames, pathFrames: [],
+    scoreMap: Object.fromEntries(
+      [...gScore.entries()].map(([k, g]) => [k, { g, f: fScore.get(k) ?? Infinity }])
+    ),
+    stats: { nodesExplored, pathLength: 0, found: false },
+  };
 }
 
-// ─── Dijkstra's Algorithm ──────────────────────────────────────────────────────
+// ─── Dijkstra ──────────────────────────────────────────────────────────────────
 
 /**
- * Dijkstra is essentially A* with a zero heuristic — guaranteed optimal path,
- * but explores far more nodes than A* with a good heuristic.
+ * Dijkstra's algorithm — optimal, uninformed.
+ * Respects terrain costs. Explores uniformly outward from the start,
+ * visiting every reachable node before giving up or finding the goal.
  */
 export function runDijkstra(grid, start, end) {
-  const frames     = [];
-  const cameFrom   = new Map();
-  const dist       = new Map();
-  const nodeKey    = (r, c) => `${r},${c}`;
-  const startKey   = nodeKey(start.row, start.col);
+  const frames   = [];
+  const cameFrom = new Map();
+  const dist     = new Map();
+  const nodeKey  = (r, c) => `${r},${c}`;
+  const startKey = nodeKey(start.row, start.col);
 
   dist.set(startKey, 0);
   const open   = new MinHeap();
   open.push({ priority: 0, row: start.row, col: start.col });
 
-  const inOpen = new Set([startKey]);
-  const closed = new Set();
+  const inOpen  = new Set([startKey]);
+  const closed  = new Set();
   let nodesExplored = 0;
 
   while (open.size > 0) {
     const { row, col } = open.pop();
     const key = nodeKey(row, col);
-
     if (closed.has(key)) continue;
+
     closed.add(key);
     inOpen.delete(key);
     nodesExplored++;
 
-    frames.push({ type: 'visit', row, col });
+    frames.push({ type: 'visit', row, col, g: dist.get(key) });
 
     if (row === end.row && col === end.col) {
       const path = reconstructPath(cameFrom, end, nodeKey);
       return {
         frames,
         pathFrames: path.map(([r, c]) => ({ type: 'path', row: r, col: c })),
-        stats: {
-          nodesExplored,
-          pathLength: path.length,
-          found: true,
-        },
+        stats: { nodesExplored, pathLength: path.length, found: true },
       };
     }
 
@@ -285,9 +306,82 @@ export function runDijkstra(grid, start, end) {
 
         if (!inOpen.has(nKey)) {
           inOpen.add(nKey);
-          frames.push({ type: 'frontier', row: node.row, col: node.col });
+          frames.push({ type: 'frontier', row: node.row, col: node.col, g: newDist });
         }
       }
+    }
+  }
+
+  return { frames, pathFrames: [], stats: { nodesExplored, pathLength: 0, found: false } };
+}
+
+// ─── Greedy Best-First Search ──────────────────────────────────────────────────
+
+/**
+ * Greedy Best-First Search — guided purely by the heuristic, ignoring actual cost.
+ * Priority: h(n) only (no g cost).
+ *
+ * Key insight vs A*:
+ *   - Greedy is usually FASTER (fewer nodes explored) because it beelines for the goal
+ *   - But it is NOT optimal — it can find dramatically longer paths in mazes
+ *   - With terrain: it completely ignores terrain cost, often walking through swamps
+ *   - With zero heuristic it degrades to BFS (explores blindly, no cost awareness)
+ *
+ * Comparing Greedy vs A* vs Dijkstra in one view makes the exploration/optimality
+ * tradeoff immediately visible.
+ */
+export function runGreedy(grid, start, end, heuristic = 'manhattan') {
+  const h        = heuristics[heuristic] ?? heuristics.manhattan;
+  const frames   = [];
+  const cameFrom = new Map();
+  const nodeKey  = (r, c) => `${r},${c}`;
+  const startKey = nodeKey(start.row, start.col);
+
+  const open   = new MinHeap();
+  open.push({
+    priority: h(start.row, start.col, end.row, end.col),
+    row: start.row,
+    col: start.col,
+  });
+
+  const inOpen  = new Set([startKey]);
+  const visited = new Set();
+  let nodesExplored = 0;
+
+  while (open.size > 0) {
+    const { row, col } = open.pop();
+    const key = nodeKey(row, col);
+    if (visited.has(key)) continue;
+
+    visited.add(key);
+    inOpen.delete(key);
+    nodesExplored++;
+
+    // Greedy frames carry the h value so tooltips can show it
+    frames.push({
+      type: 'visit', row, col,
+      h: h(row, col, end.row, end.col),
+    });
+
+    if (row === end.row && col === end.col) {
+      const path = reconstructPath(cameFrom, end, nodeKey);
+      return {
+        frames,
+        pathFrames: path.map(([r, c]) => ({ type: 'path', row: r, col: c })),
+        stats: { nodesExplored, pathLength: path.length, found: true },
+      };
+    }
+
+    for (const { node } of getNeighbors(grid, row, col)) {
+      // Greedy ignores edge cost entirely — only the heuristic matters
+      const nKey = nodeKey(node.row, node.col);
+      if (visited.has(nKey) || inOpen.has(nKey)) continue;
+
+      cameFrom.set(nKey, [row, col]);
+      const hVal = h(node.row, node.col, end.row, end.col);
+      open.push({ priority: hVal, row: node.row, col: node.col });
+      inOpen.add(nKey);
+      frames.push({ type: 'frontier', row: node.row, col: node.col, h: hVal });
     }
   }
 
@@ -308,17 +402,14 @@ function reconstructPath(cameFrom, end, nodeKey) {
 
 // ─── Maze Generation (Recursive Division) ─────────────────────────────────────
 
-/**
- * Generates a random maze using recursive division.
- * Produces interesting wall patterns that really stress-test the algorithms.
- */
 export function generateMaze(grid, startPos, endPos) {
   const newGrid = cloneGrid(grid);
 
-  // Clear everything first
+  // Clear all non-landmark cells first
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      if (newGrid[r][c].type !== NODE_TYPES.START && newGrid[r][c].type !== NODE_TYPES.END) {
+      const t = newGrid[r][c].type;
+      if (t !== NODE_TYPES.START && t !== NODE_TYPES.END) {
         newGrid[r][c].type = NODE_TYPES.EMPTY;
       }
     }
@@ -328,36 +419,30 @@ export function generateMaze(grid, startPos, endPos) {
   return newGrid;
 }
 
-function divide(grid, rStart, cStart, rEnd, cEnd, startPos, endPos) {
+function divide(grid, rStart, cStart, rEnd, cEnd) {
   if (rEnd - rStart < 2 || cEnd - cStart < 2) return;
 
-  const horizontal = (rEnd - rStart) > (cEnd - cStart);
+  const horizontal = (rEnd - rStart) >= (cEnd - cStart);
 
   if (horizontal) {
-    // Pick a random row to place a wall, biased toward the middle
     const wallRow = rStart + 1 + Math.floor(Math.random() * (rEnd - rStart - 1));
-    // Pick a random gap in the wall
     const gapCol  = cStart + Math.floor(Math.random() * (cEnd - cStart + 1));
-
     for (let c = cStart; c <= cEnd; c++) {
-      if (c === gapCol) continue;
-      const node = grid[wallRow][c];
-      if (node.type === NODE_TYPES.EMPTY) node.type = NODE_TYPES.WALL;
+      if (c !== gapCol && grid[wallRow][c].type === NODE_TYPES.EMPTY) {
+        grid[wallRow][c].type = NODE_TYPES.WALL;
+      }
     }
-
-    divide(grid, rStart,   cStart, wallRow - 1, cEnd, startPos, endPos);
-    divide(grid, wallRow + 1, cStart, rEnd,     cEnd, startPos, endPos);
+    divide(grid, rStart, cStart, wallRow - 1, cEnd);
+    divide(grid, wallRow + 1, cStart, rEnd, cEnd);
   } else {
     const wallCol = cStart + 1 + Math.floor(Math.random() * (cEnd - cStart - 1));
     const gapRow  = rStart + Math.floor(Math.random() * (rEnd - rStart + 1));
-
     for (let r = rStart; r <= rEnd; r++) {
-      if (r === gapRow) continue;
-      const node = grid[r][wallCol];
-      if (node.type === NODE_TYPES.EMPTY) node.type = NODE_TYPES.WALL;
+      if (r !== gapRow && grid[r][wallCol].type === NODE_TYPES.EMPTY) {
+        grid[r][wallCol].type = NODE_TYPES.WALL;
+      }
     }
-
-    divide(grid, rStart, cStart,   rEnd, wallCol - 1, startPos, endPos);
-    divide(grid, rStart, wallCol + 1, rEnd, cEnd,     startPos, endPos);
+    divide(grid, rStart, cStart, rEnd, wallCol - 1);
+    divide(grid, rStart, wallCol + 1, rEnd, cEnd);
   }
 }

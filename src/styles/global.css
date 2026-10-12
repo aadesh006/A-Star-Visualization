@@ -32,6 +32,10 @@
   --dijkstra-visited: rgba(220, 20, 0, 0.40);   /* clearly red */
   --dijkstra-path:    #cc1800;
 
+  /* Greedy Best-First — green, distinct from both blue and red */
+  --greedy-visited:   rgba(0, 160, 80, 0.38);
+  --greedy-path:      #00a050;
+
   /* ── Node states ── */
   --node-empty:   #f5f5f0;
   --node-wall:    #0a0a0a;

@@ -1,5 +1,4 @@
 /* ─── Grid Wrapper ──────────────────────────────────────────────────────────── */
-/* Hard border, no radius, no shadow — pure brutalist grid                     */
 .gridWrapper {
   position: relative;
   border: 2px solid var(--border);
@@ -8,10 +7,7 @@
   user-select: none;
 }
 
-/* No overlay needed — the light theme is stark enough */
-.mapOverlay {
-  display: none;
-}
+.mapOverlay { display: none; }
 
 /* ─── Grid Layout ───────────────────────────────────────────────────────────── */
 .grid {
@@ -26,90 +22,98 @@
   cursor: pointer;
   border-right: 1px solid var(--grid-line);
   border-bottom: 1px solid var(--grid-line);
-  transition: background-color 0.06s ease;
-  position: relative; /* required for z-index to work on path/start/end cells */
+  transition: background-color 0.05s ease;
+  position: relative; /* needed for z-index on path/start/end */
 }
 
-.cell:hover {
-  background-color: rgba(0, 0, 0, 0.07);
+.cell:hover { background-color: rgba(0,0,0,0.08); }
+
+/* ─── Fixed Node States ─────────────────────────────────────────────────────── */
+
+.wall  { background-color: var(--node-wall) !important; border-color: #000; }
+.start { background-color: var(--node-start) !important; border-color: #003a9a; z-index: 3; }
+.end   { background-color: var(--node-end)   !important; border-color: var(--red-dark); z-index: 3; }
+
+/* ─── Terrain ───────────────────────────────────────────────────────────────── */
+
+/* Sand — warm yellow-tan, clearly different from white empty cells */
+.sand {
+  background-color: #e8c97a;
+  border-color: #c8a84a;
 }
 
-/* ─── Node States ───────────────────────────────────────────────────────────── */
-
-/* Wall — solid black */
-.wall {
-  background-color: var(--node-wall) !important;
-  border-color: #000;
+/* Water — blue, making terrain type immediately obvious */
+.water {
+  background-color: #7ab8e8;
+  border-color: #4a88c8;
 }
 
-/* Start — blue block */
-.start {
-  background-color: var(--node-start) !important;
-  border-color: #003a9a;
-  z-index: 3;
-}
+/* ─── Frontier ──────────────────────────────────────────────────────────────── */
+.frontier { background-color: rgba(0,0,0,0.04); }
 
-/* End — red block */
-.end {
-  background-color: var(--node-end) !important;
-  border-color: var(--red-dark);
-  z-index: 3;
-}
+/* ─── Visited States ────────────────────────────────────────────────────────── */
 
-/* ─── Algorithm Visualization States ───────────────────────────────────────── */
-
-/* Frontier — just barely tinted so it doesn't dominate */
-.frontier {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
-/* A* visited — blue tint, clearly visible on white */
+/* A* — blue wash */
 .visitedAstar {
   background-color: var(--astar-visited);
-  animation: visitFlat 0.2s ease forwards;
+  animation: visitFlat 0.18s ease forwards;
 }
 
-/* Dijkstra visited — red tint */
+/* Dijkstra — red wash */
 .visitedDijkstra {
   background-color: var(--dijkstra-visited);
-  animation: visitFlat 0.2s ease forwards;
+  animation: visitFlat 0.18s ease forwards;
 }
 
-/* Both algorithms visited this node — deeper purple tint */
-.visitedBoth {
-  background-color: rgba(120, 0, 160, 0.2);
+/* Greedy — green wash — distinct from both blue and red */
+.visitedGreedy {
+  background-color: rgba(0, 160, 80, 0.22);
+  animation: visitFlat 0.18s ease forwards;
 }
 
-/* ─── Path States — sit above visited wash via z-index ─────────────────────── */
+/* A* + Dijkstra overlap — purple */
+.visitedAstarDijkstra { background-color: rgba(120, 0, 160, 0.22); }
 
-/* A* path — solid deep blue */
+/* All three overlap — dark grey */
+.visitedAll { background-color: rgba(40, 40, 40, 0.20); }
+
+/* ─── Path States — sit above visited wash ──────────────────────────────────── */
+
 .pathAstar {
   background-color: var(--astar-path) !important;
   border-color: #002a8a;
   border-top: 2px solid #7ab0ff;
   z-index: 2;
-  animation: pathStamp 0.2s ease forwards;
+  animation: pathStamp 0.18s ease forwards;
 }
 
-/* Dijkstra path — solid deep red */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
   border-color: #8a0000;
   border-top: 2px solid #ff8070;
   z-index: 2;
-  animation: pathStamp 0.2s ease forwards;
+  animation: pathStamp 0.18s ease forwards;
 }
 
-/* Shared path — purple so it's distinct from both blue and red */
-.pathBoth {
+/* Greedy path — solid green */
+.pathGreedy {
+  background-color: #00a050 !important;
+  border-color: #006030;
+  border-top: 2px solid #70e0a0;
+  z-index: 2;
+  animation: pathStamp 0.18s ease forwards;
+}
+
+/* Shared by 2+ algorithms — purple */
+.pathShared {
   background-color: #7c3aed !important;
   border-color: #5b21b6;
   border-top: 2px solid #c4b5fd;
   z-index: 2;
-  animation: pathStamp 0.2s ease forwards;
+  animation: pathStamp 0.18s ease forwards;
 }
 
-/* ─── Animations — flat, quick, no bounce ───────────────────────────────────── */
+/* ─── Animations ────────────────────────────────────────────────────────────── */
 
 @keyframes visitFlat {
   0%   { opacity: 0; }
@@ -121,28 +125,48 @@
   100% { transform: scale(1);   opacity: 1;   }
 }
 
-/* ─── Compass — minimal text marker ────────────────────────────────────────── */
+/* ─── g/f Tooltip ───────────────────────────────────────────────────────────── */
+/* Floats near the cursor after a run to show A* cost values                   */
+
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 100;
+  background: var(--fg);
+  color: var(--bg);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+}
+
+.tooltipRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tooltipKey {
+  color: var(--red);
+  font-weight: 700;
+  width: 10px;
+}
+
+.tooltipVal {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Compass ───────────────────────────────────────────────────────────────── */
 .compass {
   position: absolute;
-  bottom: 10px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  opacity: 0.15;
-  pointer-events: none;
+  bottom: 10px; right: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  opacity: 0.12; pointer-events: none;
   font-family: var(--font-mono);
 }
-
-.compassN {
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--fg);
-}
-
-.compassMarker {
-  font-size: 12px;
-  color: var(--fg);
-}
+.compassN      { font-size: 8px; font-weight: 700; letter-spacing: 2px; color: var(--fg); }
+.compassMarker { font-size: 12px; color: var(--fg); }
