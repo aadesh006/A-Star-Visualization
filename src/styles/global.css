@@ -25,12 +25,12 @@
   --red-muted:    rgba(232, 25, 10, 0.12);
 
   /* ── Algorithm visualization colors ──
-     Keep them visible against the light grid — bold, flat, no glow          */
-  --astar-visited:    rgba(0, 80, 200, 0.18);
-  --astar-path:       #0050c8;
+     Bold and flat against the light grid — no glow, just strong fills       */
+  --astar-visited:    rgba(0, 80, 200, 0.45);   /* clearly blue */
+  --astar-path:       #0040b8;
 
-  --dijkstra-visited: rgba(232, 25, 10, 0.18);
-  --dijkstra-path:    var(--red);
+  --dijkstra-visited: rgba(220, 20, 0, 0.40);   /* clearly red */
+  --dijkstra-path:    #cc1800;
 
   /* ── Node states ── */
   --node-empty:   #f5f5f0;

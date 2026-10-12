@@ -79,25 +79,28 @@
 
 /* ─── Path States — solid, full-opacity, clearly legible ───────────────────── */
 
-/* A* path — solid blue */
+/* A* path — solid deep blue, 2px top border as a stripe accent */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  border-color: #003a9a;
-  animation: pathStamp 0.25s ease forwards;
+  border-color: #002a8a;
+  border-top: 2px solid #7ab0ff;
+  animation: pathStamp 0.2s ease forwards;
 }
 
-/* Dijkstra path — solid red */
+/* Dijkstra path — solid deep red */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  border-color: var(--red-dark);
-  animation: pathStamp 0.25s ease forwards;
+  border-color: #8a0000;
+  border-top: 2px solid #ff8070;
+  animation: pathStamp 0.2s ease forwards;
 }
 
-/* Shared path — solid black — both algorithms agree */
+/* Shared path — solid black with a white top stripe */
 .pathBoth {
   background-color: var(--fg) !important;
   border-color: #000;
-  animation: pathStamp 0.25s ease forwards;
+  border-top: 2px solid #aaa;
+  animation: pathStamp 0.2s ease forwards;
 }
 
 /* ─── Animations — flat, quick, no bounce ───────────────────────────────────── */

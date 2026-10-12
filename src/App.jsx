@@ -19,7 +19,8 @@ const DEFAULT_START = { row: Math.floor(ROWS / 2), col: Math.floor(COLS * 0.15) 
 const DEFAULT_END   = { row: Math.floor(ROWS / 2), col: Math.floor(COLS * 0.85) };
 
 // Animation speed → delay per frame in ms (index 0-3)
-const SPEED_DELAYS = [30, 12, 4, 0];
+// Shifted faster across the board — the grid is large so even "slow" was sluggish
+const SPEED_DELAYS = [8, 3, 1, 0];
 
 // ─── App ───────────────────────────────────────────────────────────────────────
 
@@ -32,7 +33,7 @@ export default function App() {
   // ── Control state ──
   const [heuristic,    setHeuristic]    = useState('manhattan');
   const [weight,       setWeight]       = useState(1.0);
-  const [speed,        setSpeed]        = useState(1);
+  const [speed,        setSpeed]        = useState(2); // default to Fast
   const [interactMode, setInteractMode] = useState('wall');
 
   // ── Sidebar resize ──
