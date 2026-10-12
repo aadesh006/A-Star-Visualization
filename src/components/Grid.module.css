@@ -68,42 +68,38 @@
 
 /* ─── Path States ───────────────────────────────────────────────────────────── */
 
-/* A* — solid black with a bright white top stripe so it reads clearly */
+/* A* — electric blue, bright cyan top stripe */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  border-color: #000;
-  border-top: 3px solid #ffffff;
-  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.12);
+  border-color: #1d4ed8;
+  border-top: 3px solid #93c5fd;
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Dijkstra — solid red with a light pink top stripe */
+/* Dijkstra — vivid orange, yellow top stripe */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  border-color: var(--red-dark);
-  border-top: 3px solid #ffaaaa;
-  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.15);
+  border-color: #c2410c;
+  border-top: 3px solid #fed7aa;
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Greedy — dark grey with a light top stripe */
+/* Greedy — vivid violet, lavender top stripe */
 .pathGreedy {
   background-color: var(--greedy-path) !important;
-  border-color: #222;
-  border-top: 3px solid #aaaaaa;
-  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.10);
+  border-color: #5b21b6;
+  border-top: 3px solid #ddd6fe;
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Shared — full red accent, white stripe */
+/* Shared by 2+ — bright yellow, stands out from all three algo colors */
 .pathShared {
-  background-color: var(--red) !important;
-  border-color: var(--red-dark);
-  border-top: 3px solid #ffbbbb;
-  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.15);
+  background-color: #d97706 !important;
+  border-color: #b45309;
+  border-top: 3px solid #fef08a;
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }

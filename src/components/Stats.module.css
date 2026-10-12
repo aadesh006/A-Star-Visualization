@@ -28,9 +28,9 @@
 }
 .headerCell:last-child { border-right: none; }
 
-.astarHeader    { color: #7dd3fc; }
-.dijkstraHeader { color: #fca5a5; }
-.greedyHeader   { color: #86efac; }
+.astarHeader    { color: #93c5fd; }   /* light blue on black header */
+.dijkstraHeader { color: #fed7aa; }   /* light orange on black header */
+.greedyHeader   { color: #ddd6fe; }   /* light violet on black header */
 
 /* ─── Row cells ─────────────────────────────────────────────────────────────── */
 .rowLabel {

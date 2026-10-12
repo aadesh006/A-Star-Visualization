@@ -124,13 +124,13 @@
 }
 
 /* Dot colors per algorithm */
-.algo_astar    .algoTagDot { background: var(--astar-path); }
-.algo_dijkstra .algoTagDot { background: var(--dijkstra-path); }
-.algo_greedy   .algoTagDot { background: #00a050; }
+.algo_astar    .algoTagDot { background: #2563eb; }
+.algo_dijkstra .algoTagDot { background: #ea580c; }
+.algo_greedy   .algoTagDot { background: #7c3aed; }
 
-.algo_astar.algoTagActive    { border-left: 3px solid var(--astar-path); }
-.algo_dijkstra.algoTagActive { border-left: 3px solid var(--dijkstra-path); }
-.algo_greedy.algoTagActive   { border-left: 3px solid #00a050; }
+.algo_astar.algoTagActive    { border-left: 3px solid #2563eb; }
+.algo_dijkstra.algoTagActive { border-left: 3px solid #ea580c; }
+.algo_greedy.algoTagActive   { border-left: 3px solid #7c3aed; }
 
 .algoTagBadge {
   margin-left: auto;
