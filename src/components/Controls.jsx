@@ -1,39 +1,33 @@
 import { HEURISTICS } from '../utils/algorithms';
 import styles from './Controls.module.css';
 
-// ─── Icon components (inline SVG, no dependency needed) ───────────────────────
+// ─── Inline SVG icons — no external dependency ────────────────────────────────
 
 const PlayIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
     <path d="M8 5v14l11-7z"/>
   </svg>
 );
 
-const StopIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M6 6h12v12H6z"/>
-  </svg>
-);
-
 const ResetIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
     <path d="M3 3v5h5"/>
   </svg>
 );
 
 const MazeIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <rect x="3" y="3" width="18" height="18"/>
     <path d="M9 3v6M15 3v4M3 9h6M15 9h6M3 15h4M9 15h6M15 15v6M9 21v-6M3 21h6"/>
   </svg>
 );
 
-// ─── Mode buttons config — determines what clicking a cell does ───────────────
+// ─── Draw mode options ─────────────────────────────────────────────────────────
 const MODES = [
-  { id: 'wall',  label: 'Wall',  icon: '■', title: 'Click/drag to draw walls' },
-  { id: 'start', label: 'Start', icon: '◉', title: 'Click to move start point' },
-  { id: 'end',   label: 'End',   icon: '◎', title: 'Click to move end point'   },
+  { id: 'wall',  label: 'WALL',  title: 'Click/drag to draw walls'  },
+  { id: 'start', label: 'START', title: 'Click to place start node' },
+  { id: 'end',   label: 'END',   title: 'Click to place end node'   },
 ];
 
 // ─── Controls Component ────────────────────────────────────────────────────────
@@ -55,20 +49,18 @@ export default function Controls({
 }) {
   return (
     <aside className={styles.panel}>
-      {/* ── Header ── */}
+
+      {/* ── Oversized header block — Swiss-inspired ── */}
       <div className={styles.header}>
-        <div className={styles.logo}>
-          <span className={styles.logoMark}>⬡</span>
-          <div>
-            <div className={styles.logoTitle}>Pathfinder</div>
-            <div className={styles.logoSub}>A* vs Dijkstra</div>
-          </div>
-        </div>
+        <div className={styles.headerTag}>PATHFINDING</div>
+        <div className={styles.headerTitle}>A* <span className={styles.vs}>VS</span></div>
+        <div className={styles.headerTitle}>DIJKSTRA</div>
+        <div className={styles.headerSub}>— graph traversal visualizer</div>
       </div>
 
-      {/* ── Interaction Mode ── */}
+      {/* ── Draw Mode ── */}
       <section className={styles.section}>
-        <label className={styles.sectionLabel}>Draw Mode</label>
+        <div className={styles.sectionLabel}>DRAW MODE</div>
         <div className={styles.modeGroup}>
           {MODES.map(m => (
             <button
@@ -78,7 +70,6 @@ export default function Controls({
               title={m.title}
               disabled={isRunning}
             >
-              <span className={styles.modeIcon}>{m.icon}</span>
               {m.label}
             </button>
           ))}
@@ -87,10 +78,10 @@ export default function Controls({
 
       {/* ── Heuristic ── */}
       <section className={styles.section}>
-        <label className={styles.sectionLabel}>
-          A* Heuristic
-          <span className={styles.hint}>affects exploration shape</span>
-        </label>
+        <div className={styles.sectionLabel}>
+          HEURISTIC
+          <span className={styles.labelNote}>A* only</span>
+        </div>
         <div className={styles.selectWrapper}>
           <select
             className={styles.select}
@@ -102,18 +93,16 @@ export default function Controls({
               <option key={key} value={key}>{label}</option>
             ))}
           </select>
-          <span className={styles.selectArrow}>▾</span>
         </div>
-        {/* Describe what the selected heuristic actually does */}
         <p className={styles.heuristicDesc}>{HEURISTIC_DESCRIPTIONS[heuristic]}</p>
       </section>
 
-      {/* ── Weight Slider ── */}
+      {/* ── Weight ── */}
       <section className={styles.section}>
-        <label className={styles.sectionLabel}>
-          Heuristic Weight
+        <div className={styles.sectionLabel}>
+          WEIGHT
           <span className={styles.valueTag}>×{weight.toFixed(1)}</span>
-        </label>
+        </div>
         <input
           type="range"
           min="0"
@@ -125,23 +114,23 @@ export default function Controls({
           disabled={isRunning}
         />
         <div className={styles.sliderLabels}>
-          <span>0 (Dijkstra)</span>
-          <span>1 (optimal)</span>
-          <span>5 (fast)</span>
+          <span>0</span>
+          <span>1 ← optimal</span>
+          <span>5</span>
         </div>
         {weight > 1 && (
-          <p className={styles.weightWarning}>
-            ⚠ Weight &gt; 1 — A* may find suboptimal paths but explores fewer nodes
-          </p>
+          <div className={styles.warningBox}>
+            w &gt; 1 — suboptimal path, fewer explored nodes
+          </div>
         )}
       </section>
 
       {/* ── Speed ── */}
       <section className={styles.section}>
-        <label className={styles.sectionLabel}>
-          Animation Speed
+        <div className={styles.sectionLabel}>
+          SPEED
           <span className={styles.valueTag}>{SPEED_LABELS[speed]}</span>
-        </label>
+        </div>
         <input
           type="range"
           min="0"
@@ -152,28 +141,25 @@ export default function Controls({
           className={styles.slider}
         />
         <div className={styles.sliderLabels}>
-          <span>Slow</span>
-          <span style={{ marginLeft: 'auto' }}>Instant</span>
+          <span>SLOW</span>
+          <span>INSTANT</span>
         </div>
       </section>
 
-      {/* ── Action Buttons ── */}
+      {/* ── Actions ── */}
       <section className={styles.actions}>
         <button
-          className={`${styles.btn} ${styles.btnPrimary} ${isRunning ? styles.btnRunning : ''}`}
+          className={`${styles.btn} ${styles.btnRun} ${isRunning ? styles.btnRunning : ''}`}
           onClick={onRun}
           disabled={isRunning}
         >
           <PlayIcon />
-          {isRunning ? 'Running…' : 'Visualize'}
+          {isRunning ? 'RUNNING…' : 'RUN'}
         </button>
 
-        <button
-          className={`${styles.btn} ${styles.btnSecondary}`}
-          onClick={onReset}
-        >
+        <button className={`${styles.btn} ${styles.btnOutline}`} onClick={onReset}>
           <ResetIcon />
-          Clear Paths
+          CLEAR PATHS
         </button>
 
         <div className={styles.btnRow}>
@@ -181,62 +167,36 @@ export default function Controls({
             className={`${styles.btn} ${styles.btnGhost}`}
             onClick={onMaze}
             disabled={isRunning}
-            title="Generate a random maze"
           >
             <MazeIcon />
-            Maze
+            MAZE
           </button>
           <button
             className={`${styles.btn} ${styles.btnGhost}`}
             onClick={onClear}
             disabled={isRunning}
-            title="Clear all walls"
           >
-            Clear All
+            CLEAR ALL
           </button>
         </div>
       </section>
 
-      {/* ── Legend ── */}
-      <section className={styles.section}>
-        <label className={styles.sectionLabel}>Legend</label>
-        <div className={styles.legend}>
-          <LegendItem color="var(--node-start)"      label="Start" />
-          <LegendItem color="var(--node-end)"        label="End" />
-          <LegendItem color="var(--node-wall)"       label="Wall" border />
-          <LegendItem color="var(--astar-visited)"   label="A* visited" />
-          <LegendItem color="var(--dijkstra-visited)" label="Dijkstra visited" />
-          <LegendItem color="var(--astar-path)"      label="A* path" />
-          <LegendItem color="var(--dijkstra-path)"   label="Dijkstra path" />
-          <LegendItem color="#c8d8ff"                label="Shared path" />
-        </div>
-      </section>
+      {/* ── Version tag at the bottom — docs site aesthetic ── */}
+      <div className={styles.footer}>
+        <span>v0.1.0</span>
+        <span>8-dir grid · {28}×{56}</span>
+      </div>
+
     </aside>
   );
 }
 
-function LegendItem({ color, label, border }) {
-  return (
-    <div className={styles.legendItem}>
-      <span
-        className={styles.legendSwatch}
-        style={{
-          background: color,
-          border: border ? '1px solid #333' : 'none',
-        }}
-      />
-      <span>{label}</span>
-    </div>
-  );
-}
-
-// Short descriptions shown under the heuristic dropdown
 const HEURISTIC_DESCRIPTIONS = {
-  manhattan:  'Diagonal not allowed — explores in a cross/diamond shape.',
-  euclidean:  'Straight-line distance — explores in a circular shape.',
-  chebyshev:  'Diagonals cost 1 — explores in a square shape.',
-  octile:     'Diagonals cost √2 — most accurate for 8-dir grids.',
-  zero:       'No guidance — A* degrades to Dijkstra (uniform cost).',
+  manhattan:  'Allows only cardinal moves. Explores in a diamond/cross shape.',
+  euclidean:  'Straight-line distance. Explores in a circular frontier.',
+  chebyshev:  'Diagonals cost 1. Explores in a square shape.',
+  octile:     'Diagonals cost √2. Most accurate for 8-directional grids.',
+  zero:       'No heuristic guidance. Degrades to Dijkstra behavior.',
 };
 
-const SPEED_LABELS = ['Slow', 'Normal', 'Fast', 'Instant'];
+const SPEED_LABELS = ['SLOW', 'NORMAL', 'FAST', 'INSTANT'];

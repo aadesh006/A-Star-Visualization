@@ -1,23 +1,16 @@
 /* ─── Grid Wrapper ──────────────────────────────────────────────────────────── */
+/* Hard border, no radius, no shadow — pure brutalist grid                     */
 .gridWrapper {
   position: relative;
-  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
   overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow:
-    0 0 0 1px var(--border-light),
-    0 24px 64px rgba(0, 0, 0, 0.55);
   background: var(--node-empty);
   user-select: none;
 }
 
-/* Subtle vignette overlay — pulls focus toward the center of the grid */
+/* No overlay needed — the light theme is stark enough */
 .mapOverlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(6, 12, 24, 0.35) 100%);
+  display: none;
 }
 
 /* ─── Grid Layout ───────────────────────────────────────────────────────────── */
@@ -25,8 +18,6 @@
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   width: 100%;
-  position: relative;
-  z-index: 2;
 }
 
 /* ─── Base Cell ─────────────────────────────────────────────────────────────── */
@@ -35,146 +26,114 @@
   cursor: pointer;
   border-right: 1px solid var(--grid-line);
   border-bottom: 1px solid var(--grid-line);
-  transition:
-    background-color 0.07s ease,
-    box-shadow 0.07s ease;
-  position: relative;
+  transition: background-color 0.06s ease;
 }
 
 .cell:hover {
-  background-color: rgba(255, 255, 255, 0.09);
+  background-color: rgba(0, 0, 0, 0.07);
 }
 
 /* ─── Node States ───────────────────────────────────────────────────────────── */
 
+/* Wall — solid black */
 .wall {
   background-color: var(--node-wall) !important;
-  border-color: #020408;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6);
+  border-color: #000;
 }
 
-/* Start — emerald glow */
+/* Start — blue block */
 .start {
   background-color: var(--node-start) !important;
-  border-color: rgba(52, 211, 153, 0.4);
-  box-shadow:
-    inset 0 0 8px rgba(52, 211, 153, 0.35),
-    0 0 10px rgba(52, 211, 153, 0.45);
-  z-index: 3;
+  border-color: #003a9a;
 }
 
-/* End — red glow */
+/* End — red block */
 .end {
   background-color: var(--node-end) !important;
-  border-color: rgba(248, 113, 113, 0.4);
-  box-shadow:
-    inset 0 0 8px rgba(248, 113, 113, 0.35),
-    0 0 10px rgba(248, 113, 113, 0.45);
-  z-index: 3;
+  border-color: var(--red-dark);
 }
 
 /* ─── Algorithm Visualization States ───────────────────────────────────────── */
 
-/* Frontier — nodes being considered, faint glow */
+/* Frontier — just barely tinted so it doesn't dominate */
 .frontier {
-  background-color: rgba(99, 102, 241, 0.12);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
-/* A* visited — rich cyan wash, clearly visible */
+/* A* visited — blue tint, clearly visible on white */
 .visitedAstar {
   background-color: var(--astar-visited);
-  animation: visitAstar 0.25s ease forwards;
+  animation: visitFlat 0.2s ease forwards;
 }
 
-/* Dijkstra visited — rich amber wash */
+/* Dijkstra visited — red tint */
 .visitedDijkstra {
   background-color: var(--dijkstra-visited);
-  animation: visitDijkstra 0.25s ease forwards;
+  animation: visitFlat 0.2s ease forwards;
 }
 
-/* Both visited — violet blend */
+/* Both algorithms visited this node — deeper purple tint */
 .visitedBoth {
-  background-color: rgba(180, 100, 200, 0.38);
+  background-color: rgba(120, 0, 160, 0.2);
 }
 
-/* ─── Path States — bold, bright, unmissable ─────────────────────────────── */
+/* ─── Path States — solid, full-opacity, clearly legible ───────────────────── */
 
-/* A* path — solid bright cyan */
+/* A* path — solid blue */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  box-shadow:
-    0 0 0 1px rgba(34, 211, 238, 0.5),
-    0 0 10px rgba(34, 211, 238, 0.7),
-    inset 0 0 6px rgba(255, 255, 255, 0.2);
-  animation: pathAppear 0.35s ease forwards;
-  z-index: 2;
+  border-color: #003a9a;
+  animation: pathStamp 0.25s ease forwards;
 }
 
-/* Dijkstra path — solid bright orange */
+/* Dijkstra path — solid red */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  box-shadow:
-    0 0 0 1px rgba(251, 146, 60, 0.5),
-    0 0 10px rgba(251, 146, 60, 0.7),
-    inset 0 0 6px rgba(255, 255, 255, 0.2);
-  animation: pathAppear 0.35s ease forwards;
-  z-index: 2;
+  border-color: var(--red-dark);
+  animation: pathStamp 0.25s ease forwards;
 }
 
-/* Shared path — bright white-yellow where both algorithms agree */
+/* Shared path — solid black — both algorithms agree */
 .pathBoth {
-  background-color: #fde68a !important;
-  box-shadow:
-    0 0 0 1px rgba(253, 230, 138, 0.6),
-    0 0 12px rgba(253, 230, 138, 0.8),
-    inset 0 0 6px rgba(255, 255, 255, 0.3);
-  animation: pathAppear 0.35s ease forwards;
-  z-index: 2;
+  background-color: var(--fg) !important;
+  border-color: #000;
+  animation: pathStamp 0.25s ease forwards;
 }
 
-/* ─── Animations ────────────────────────────────────────────────────────────── */
+/* ─── Animations — flat, quick, no bounce ───────────────────────────────────── */
 
-@keyframes visitAstar {
-  0%   { transform: scale(0.2); background-color: rgba(34, 211, 238, 0.9); }
-  55%  { transform: scale(1.12); }
-  100% { transform: scale(1);   background-color: var(--astar-visited); }
+@keyframes visitFlat {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-@keyframes visitDijkstra {
-  0%   { transform: scale(0.2); background-color: rgba(251, 146, 60, 0.9); }
-  55%  { transform: scale(1.12); }
-  100% { transform: scale(1);   background-color: var(--dijkstra-visited); }
+@keyframes pathStamp {
+  0%   { transform: scale(0.7); opacity: 0.6; }
+  100% { transform: scale(1);   opacity: 1;   }
 }
 
-@keyframes pathAppear {
-  0%   { transform: scale(0.5); opacity: 0.3; }
-  65%  { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1);   opacity: 1; }
-}
-
-/* ─── Compass Rose ──────────────────────────────────────────────────────────── */
+/* ─── Compass — minimal text marker ────────────────────────────────────────── */
 .compass {
   position: absolute;
-  bottom: 12px;
-  right: 14px;
+  bottom: 10px;
+  right: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  opacity: 0.2;
+  opacity: 0.15;
   pointer-events: none;
-  z-index: 3;
   font-family: var(--font-mono);
 }
 
 .compassN {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--fg);
 }
 
 .compassMarker {
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 12px;
+  color: var(--fg);
 }

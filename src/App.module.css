@@ -3,49 +3,28 @@
   display: flex;
   height: 100dvh;
   overflow: hidden;
-  background: var(--bg-primary);
-  /* Prevent text selection while dragging the resize handle */
+  background: var(--bg);
   user-select: none;
 }
 
-/* ─── Resize Handle ─────────────────────────────────────────────────────────── */
-/* The thin draggable strip between sidebar and grid */
+/* ─── Resize Handle — thin black bar, turns red on hover ───────────────────── */
 .resizeHandle {
-  width: 4px;
-  min-width: 4px;
-  background: var(--border);
+  width: 3px;
+  min-width: 3px;
+  background: var(--border-light);
   cursor: col-resize;
   flex-shrink: 0;
   position: relative;
-  transition: background 0.15s;
+  transition: background 0.1s;
   z-index: 10;
 }
 
 .resizeHandle:hover,
 .resizeHandle:active {
-  background: var(--accent);
+  background: var(--red);
 }
 
-/* Visual affordance dot in the middle of the handle */
-.resizeHandle::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 4px;
-  height: 32px;
-  border-radius: 2px;
-  background: var(--border-light);
-  transition: background 0.15s;
-}
-
-.resizeHandle:hover::after {
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent-glow);
-}
-
-/* ─── Main content area (grid + stats) ─────────────────────────────────────── */
+/* ─── Main area ─────────────────────────────────────────────────────────────── */
 .main {
   flex: 1;
   display: flex;
@@ -54,13 +33,14 @@
   min-width: 0;
 }
 
-/* ─── Grid area — fills remaining space ─────────────────────────────────────── */
+/* ─── Grid area ─────────────────────────────────────────────────────────────── */
 .gridArea {
   flex: 1;
   padding: 20px;
   display: flex;
   align-items: stretch;
   overflow: hidden;
+  background: var(--bg);
 }
 
 .gridArea > * {

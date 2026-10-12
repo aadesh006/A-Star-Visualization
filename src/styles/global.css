@@ -6,61 +6,55 @@
 }
 
 :root {
-  /* Slate/navy base — dark but not pitch black, easier on the eyes */
-  --bg-primary:       #111827;
-  --bg-secondary:     #1a2336;
-  --bg-panel:         #0f172a;
-  --bg-card:          #1e293b;
-  --border:           #2d3f5c;
-  --border-light:     #3d5070;
+  /* ── Monochrome core ── */
+  --bg:           #f5f5f0;       /* warm off-white — not pure white, less harsh */
+  --bg-panel:     #ebebeb;       /* sidebar background */
+  --bg-card:      #e0e0db;       /* inset card areas */
+  --fg:           #0a0a0a;       /* near-black text */
+  --fg-muted:     #555550;       /* secondary text */
+  --fg-faint:     #999990;       /* labels, placeholders */
 
-  /* Text */
-  --text-primary:     #f1f5f9;
-  --text-secondary:   #94a3b8;
-  --text-muted:       #4a5a74;
+  /* ── Borders — thin black lines, neo-brutal signature ── */
+  --border:       #0a0a0a;
+  --border-mid:   #333330;
+  --border-light: #aaaaaa;
 
-  /* Accent — indigo */
-  --accent:           #6366f1;
-  --accent-hover:     #818cf8;
-  --accent-glow:      rgba(99, 102, 241, 0.22);
+  /* ── Red accent — the only color in the system ── */
+  --red:          #e8190a;
+  --red-dark:     #b01005;
+  --red-muted:    rgba(232, 25, 10, 0.12);
 
-  /* ── A* — vivid cyan ──────────────────────────────────────────────────────
-     High contrast against the dark grid; explored area is clearly visible   */
-  --astar-primary:    #22d3ee;
-  --astar-visited:    rgba(34, 211, 238, 0.38);
-  --astar-frontier:   rgba(34, 211, 238, 0.65);
-  --astar-path:       #22d3ee;
+  /* ── Algorithm visualization colors ──
+     Keep them visible against the light grid — bold, flat, no glow          */
+  --astar-visited:    rgba(0, 80, 200, 0.18);
+  --astar-path:       #0050c8;
 
-  /* ── Dijkstra — vivid amber/orange ───────────────────────────────────────
-     Warm counterpart to A*'s cool cyan; clearly distinct at a glance        */
-  --dijkstra-primary: #fb923c;
-  --dijkstra-visited: rgba(251, 146, 60, 0.35);
-  --dijkstra-frontier:rgba(251, 146, 60, 0.60);
-  --dijkstra-path:    #fb923c;
+  --dijkstra-visited: rgba(232, 25, 10, 0.18);
+  --dijkstra-path:    var(--red);
 
-  /* Node states */
-  --node-empty:       #1a2744;   /* slightly blue-tinted so the grid looks like a map */
-  --node-wall:        #060c18;   /* near-black, high contrast with empty */
-  --node-start:       #34d399;   /* emerald green */
-  --node-end:         #f87171;   /* soft red */
+  /* ── Node states ── */
+  --node-empty:   #f5f5f0;
+  --node-wall:    #0a0a0a;
+  --node-start:   #0050c8;       /* blue — distinct from red Dijkstra */
+  --node-end:     var(--red);
 
-  /* Grid lines */
-  --grid-line:        rgba(45, 63, 92, 0.9);
+  /* ── Grid lines ── */
+  --grid-line:    rgba(10, 10, 10, 0.1);
 
-  --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  16px;
+  /* ── Typography ── */
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
 
-  --font-sans:  'Inter', system-ui, sans-serif;
-  --font-mono:  'JetBrains Mono', monospace;
+  /* No border-radius — hard corners everywhere */
+  --radius: 0px;
 }
 
 html, body {
   height: 100%;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: var(--bg);
+  color: var(--fg);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -69,11 +63,11 @@ html, body {
   height: 100%;
 }
 
-/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+/* ─── Scrollbar — minimal, monochrome ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-panel); }
+::-webkit-scrollbar-thumb { background: var(--border-light); }
+::-webkit-scrollbar-thumb:hover { background: var(--border-mid); }
 
 /* ─── Utility ───────────────────────────────────────────────────────────────── */
 .sr-only {
