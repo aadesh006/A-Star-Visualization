@@ -86,14 +86,6 @@ export default function App() {
         if (node.type === NODE_TYPES.START || node.type === NODE_TYPES.END) return prev;
         node.type = dragAction === 'erase' ? NODE_TYPES.EMPTY : NODE_TYPES.WALL;
 
-      } else if (interactMode === 'sand') {
-        if (node.type === NODE_TYPES.START || node.type === NODE_TYPES.END || node.type === NODE_TYPES.WALL) return prev;
-        node.type = dragAction === 'erase' ? NODE_TYPES.EMPTY : NODE_TYPES.SAND;
-
-      } else if (interactMode === 'water') {
-        if (node.type === NODE_TYPES.START || node.type === NODE_TYPES.END || node.type === NODE_TYPES.WALL) return prev;
-        node.type = dragAction === 'erase' ? NODE_TYPES.EMPTY : NODE_TYPES.WATER;
-
       } else if (interactMode === 'start') {
         if (node.type === NODE_TYPES.END || node.type === NODE_TYPES.WALL) return prev;
         next[startPos.row][startPos.col].type = NODE_TYPES.EMPTY;

@@ -3,32 +3,20 @@
 export const ROWS = 28;
 export const COLS = 56;
 
-// Node type identifiers — wall blocks movement, terrain types add movement cost
+// Node type identifiers
 export const NODE_TYPES = {
   EMPTY:  'empty',
   WALL:   'wall',
-  SAND:   'sand',   // cost ×3 — slows movement significantly
-  WATER:  'water',  // cost ×5 — very expensive to cross
   START:  'start',
   END:    'end',
 };
 
-// Terrain traversal costs — higher = harder to cross
-// Dijkstra and A* both respect these; Greedy ignores actual costs (heuristic only)
-export const TERRAIN_COSTS = {
+// All cells have uniform cost — terrain system removed
+const TERRAIN_COSTS = {
   [NODE_TYPES.EMPTY]: 1,
-  [NODE_TYPES.SAND]:  3,
-  [NODE_TYPES.WATER]: 5,
   [NODE_TYPES.START]: 1,
   [NODE_TYPES.END]:   1,
 };
-
-// Terrain types the user can paint onto the grid (excludes start/end/wall)
-export const TERRAIN_TYPES = [
-  { id: NODE_TYPES.EMPTY, label: 'EMPTY', cost: 1  },
-  { id: NODE_TYPES.SAND,  label: 'SAND',  cost: 3  },
-  { id: NODE_TYPES.WATER, label: 'WATER', cost: 5  },
-];
 
 // All valid heuristic functions for A* and Greedy
 export const HEURISTICS = {

@@ -9,13 +9,11 @@ const StepIcon  = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="cu
 const ResetIcon = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
 const MazeIcon  = () => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18"/><path d="M9 3v6M15 3v4M3 9h6M15 9h6M3 15h4M9 15h6M15 15v6M9 21v-6M3 21h6"/></svg>;
 
-// ─── Draw modes — wall + terrain + start/end ──────────────────────────────────
+// ─── Draw modes ───────────────────────────────────────────────────────────────
 const DRAW_MODES = [
-  { id: 'wall',  label: 'WALL',  title: 'Click/drag to draw walls'          },
-  { id: 'sand',  label: 'SAND',  title: 'Draw sand terrain (cost ×3)'       },
-  { id: 'water', label: 'WATER', title: 'Draw water terrain (cost ×5)'      },
-  { id: 'start', label: 'START', title: 'Click to relocate start node'      },
-  { id: 'end',   label: 'END',   title: 'Click to relocate end node'        },
+  { id: 'wall',  label: 'WALL',  title: 'Click/drag to draw walls'     },
+  { id: 'start', label: 'START', title: 'Click to relocate start node' },
+  { id: 'end',   label: 'END',   title: 'Click to relocate end node'   },
 ];
 
 const HEURISTIC_DESCRIPTIONS = {
@@ -66,9 +64,6 @@ export default function Controls({
               {m.label}
             </button>
           ))}
-        </div>
-        <div className={styles.terrainHint}>
-          Sand ×3 cost &nbsp;·&nbsp; Water ×5 cost &nbsp;·&nbsp; drag to erase
         </div>
       </section>
 
@@ -194,8 +189,8 @@ export default function Controls({
         <div className={styles.insightList}>
           <InsightRow label="A* vs Dijkstra"  text="A* explores fewer nodes using the heuristic as a guide" />
           <InsightRow label="Weight &gt; 1"   text="Faster search but may skip the true shortest path" />
-          <InsightRow label="Greedy"           text="Fastest to goal but ignores costs — path often suboptimal" />
-          <InsightRow label="Terrain"          text="Hover cells post-run to see g (actual) and f (estimated) costs" />
+          <InsightRow label="Greedy"           text="Beelines for the goal — fast but often finds a longer path" />
+          <InsightRow label="Scores"           text="Hover cells post-run to inspect A* g / f / h values" />
         </div>
       </section>
 

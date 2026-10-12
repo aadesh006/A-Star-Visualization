@@ -69,8 +69,7 @@
   letter-spacing: 0; text-transform: none;
 }
 
-/* ─── Draw Mode Grid ────────────────────────────────────────────────────────── */
-/* 5 buttons: wall, sand, water, start, end — 3 on top row, 2 on bottom        */
+/* ─── Draw Mode Grid — 3 buttons ───────────────────────────────────────────── */
 .modeGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -79,8 +78,8 @@
 }
 
 .modeBtn {
-  padding: 7px 4px;
-  border: none; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 8px 4px;
+  border: none; border-right: 1px solid var(--border);
   background: var(--bg); color: var(--fg-muted);
   font-family: var(--font-mono); font-size: 9px; font-weight: 700;
   letter-spacing: 0.1em; cursor: pointer;
@@ -88,25 +87,15 @@
   text-align: center;
 }
 
-.modeBtn:nth-child(3)  { border-right: none; }
-.modeBtn:nth-child(4),
-.modeBtn:nth-child(5)  { border-bottom: none; }
-.modeBtn:last-child    { border-right: none; border-bottom: none; }
+.modeBtn:last-child { border-right: none; }
 
 .modeBtn:hover:not(:disabled) { background: var(--fg); color: var(--bg); }
 .modeBtn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-/* Active state per terrain type */
-.modeBtnActive               { background: var(--fg)   !important; color: var(--bg)  !important; }
-.mode_sand.modeBtnActive     { background: #c8a84a     !important; color: #fff       !important; }
-.mode_water.modeBtnActive    { background: #4a88c8     !important; color: #fff       !important; }
-.mode_start.modeBtnActive    { background: var(--node-start) !important; color: #fff  !important; }
-.mode_end.modeBtnActive      { background: var(--node-end)   !important; color: #fff  !important; }
-
-.terrainHint {
-  font-family: var(--font-mono); font-size: 9px;
-  color: var(--fg-faint); letter-spacing: 0.03em; line-height: 1.5;
-}
+/* Active: black fill for wall, colored for start/end */
+.modeBtnActive                { background: var(--fg)           !important; color: var(--bg)  !important; }
+.mode_start.modeBtnActive     { background: var(--node-start)   !important; color: #fff        !important; }
+.mode_end.modeBtnActive       { background: var(--node-end)     !important; color: #fff        !important; }
 
 /* ─── Algorithm Tags ────────────────────────────────────────────────────────── */
 .algoList {

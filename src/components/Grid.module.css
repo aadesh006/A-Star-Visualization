@@ -34,26 +34,9 @@
 .start { background-color: var(--node-start) !important; border-color: #003a9a; z-index: 3; }
 .end   { background-color: var(--node-end)   !important; border-color: var(--red-dark); z-index: 3; }
 
-/* ─── Terrain ───────────────────────────────────────────────────────────────── */
-
-/* Sand — warm yellow-tan, clearly different from white empty cells */
-.sand {
-  background-color: #e8c97a;
-  border-color: #c8a84a;
-}
-
-/* Water — blue, making terrain type immediately obvious */
-.water {
-  background-color: #7ab8e8;
-  border-color: #4a88c8;
-}
-
-/* ─── Frontier ──────────────────────────────────────────────────────────────── */
-.frontier { background-color: rgba(0,0,0,0.04); }
-
 /* ─── Visited States ────────────────────────────────────────────────────────── */
 
-/* A* — blue wash */
+/* A* — dark grey wash */
 .visitedAstar {
   background-color: var(--astar-visited);
   animation: visitFlat 0.18s ease forwards;
@@ -65,50 +48,52 @@
   animation: visitFlat 0.18s ease forwards;
 }
 
-/* Greedy — green wash — distinct from both blue and red */
+/* Greedy — lighter grey wash */
 .visitedGreedy {
-  background-color: rgba(0, 160, 80, 0.22);
+  background-color: var(--greedy-visited);
   animation: visitFlat 0.18s ease forwards;
 }
 
-/* A* + Dijkstra overlap — purple */
-.visitedAstarDijkstra { background-color: rgba(120, 0, 160, 0.22); }
+/* A* + Dijkstra overlap — darker red-grey blend */
+.visitedAstarDijkstra { background-color: rgba(100, 10, 10, 0.22); }
 
-/* All three overlap — dark grey */
-.visitedAll { background-color: rgba(40, 40, 40, 0.20); }
+/* All three overlap */
+.visitedAll { background-color: rgba(20, 20, 20, 0.28); }
 
-/* ─── Path States — sit above visited wash ──────────────────────────────────── */
+/* ─── Path States ───────────────────────────────────────────────────────────── */
 
+/* A* — solid black, top stripe white (inverted for contrast) */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  border-color: #002a8a;
-  border-top: 2px solid #7ab0ff;
+  border-color: #000;
+  border-top: 2px solid rgba(255,255,255,0.3);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
+/* Dijkstra — solid red */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  border-color: #8a0000;
-  border-top: 2px solid #ff8070;
+  border-color: var(--red-dark);
+  border-top: 2px solid rgba(255,255,255,0.3);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Greedy path — solid green */
+/* Greedy — mid-grey */
 .pathGreedy {
-  background-color: #00a050 !important;
-  border-color: #006030;
-  border-top: 2px solid #70e0a0;
+  background-color: var(--greedy-path) !important;
+  border-color: #333;
+  border-top: 2px solid rgba(255,255,255,0.25);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Shared by 2+ algorithms — purple */
+/* Shared by 2+ algorithms — use the red accent at full intensity */
 .pathShared {
-  background-color: #7c3aed !important;
-  border-color: #5b21b6;
-  border-top: 2px solid #c4b5fd;
+  background-color: var(--red) !important;
+  border-color: var(--red-dark);
+  border-top: 2px solid rgba(255,255,255,0.35);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
