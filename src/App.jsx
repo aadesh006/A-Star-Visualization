@@ -299,7 +299,6 @@ export default function App() {
         advanceOneFrame(queue);
       }
     } else if (queue.phase === 'path') {
-    } else if (queue.phase === 'path') {
       const { astarResult, dijkstraResult, greedyResult } = queue;
       if (queue.tick < queue.maxPath) {
         const aFrame = astarResult.pathFrames[queue.tick];
