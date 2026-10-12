@@ -25,17 +25,18 @@
   --red-muted:    rgba(232, 25, 10, 0.12);
 
   /* ── Algorithm visualization colors — monochrome + red scheme ──
-     A* = black (the dominant algo), Dijkstra = red (the accent),
-     Greedy = mid-grey (supporting, least important),
-     visited washes are faint tints of the same colors               */
-  --astar-visited:    rgba(10, 10, 10, 0.18);    /* dark grey wash */
+     Visited washes kept faint so the solid paths pop above them.
+     A* = black path on light grey wash
+     Dijkstra = red path on very faint red wash
+     Greedy = dark grey path on near-invisible wash                  */
+  --astar-visited:    rgba(10, 10, 10, 0.10);    /* very faint so black path pops */
   --astar-path:       #0a0a0a;                   /* solid black */
 
-  --dijkstra-visited: rgba(232, 25, 10, 0.22);   /* red wash */
-  --dijkstra-path:    var(--red);                /* solid red */
+  --dijkstra-visited: rgba(232, 25, 10, 0.12);   /* faint red wash */
+  --dijkstra-path:    var(--red);                /* solid red #e8190a */
 
-  --greedy-visited:   rgba(10, 10, 10, 0.10);    /* lighter grey wash */
-  --greedy-path:      #555550;                   /* mid-grey */
+  --greedy-visited:   rgba(10, 10, 10, 0.06);    /* barely visible */
+  --greedy-path:      #444440;                   /* slightly lighter dark grey */
 
   /* ── Node states ── */
   --node-empty:   #f5f5f0;

@@ -62,38 +62,42 @@
 
 /* ─── Path States ───────────────────────────────────────────────────────────── */
 
-/* A* — solid black, top stripe white (inverted for contrast) */
+/* A* — solid black with a bright white top stripe so it reads clearly */
 .pathAstar {
   background-color: var(--astar-path) !important;
   border-color: #000;
-  border-top: 2px solid rgba(255,255,255,0.3);
+  border-top: 3px solid #ffffff;
+  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.12);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Dijkstra — solid red */
+/* Dijkstra — solid red with a light pink top stripe */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
   border-color: var(--red-dark);
-  border-top: 2px solid rgba(255,255,255,0.3);
+  border-top: 3px solid #ffaaaa;
+  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.15);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Greedy — mid-grey */
+/* Greedy — dark grey with a light top stripe */
 .pathGreedy {
   background-color: var(--greedy-path) !important;
-  border-color: #333;
-  border-top: 2px solid rgba(255,255,255,0.25);
+  border-color: #222;
+  border-top: 3px solid #aaaaaa;
+  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.10);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
 
-/* Shared by 2+ algorithms — use the red accent at full intensity */
+/* Shared — full red accent, white stripe */
 .pathShared {
   background-color: var(--red) !important;
   border-color: var(--red-dark);
-  border-top: 2px solid rgba(255,255,255,0.35);
+  border-top: 3px solid #ffbbbb;
+  box-shadow: inset 0 -2px 0 rgba(255,255,255,0.15);
   z-index: 2;
   animation: pathStamp 0.18s ease forwards;
 }
