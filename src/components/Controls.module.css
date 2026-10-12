@@ -123,10 +123,10 @@
   flex-shrink: 0;
 }
 
-/* Dot colors per algorithm */
-.algo_astar    .algoTagDot { background: #2563eb; }
-.algo_dijkstra .algoTagDot { background: #ea580c; }
-.algo_greedy   .algoTagDot { background: #7c3aed; }
+/* Dot colors match visited wash colors so sidebar is visually consistent with grid */
+.algo_astar    .algoTagDot { background: #2563eb; }   /* blue wash */
+.algo_dijkstra .algoTagDot { background: #ea580c; }   /* orange wash */
+.algo_greedy   .algoTagDot { background: #7c3aed; }   /* violet wash */
 
 .algo_astar.algoTagActive    { border-left: 3px solid #2563eb; }
 .algo_dijkstra.algoTagActive { border-left: 3px solid #ea580c; }

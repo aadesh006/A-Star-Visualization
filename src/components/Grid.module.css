@@ -66,40 +66,43 @@
 /* All three overlap */
 .visitedAll { background-color: rgba(20, 20, 20, 0.28); }
 
-/* ─── Path States — bold, outlined, impossible to miss ─────────────────────── */
+/* ─── Path States ────────────────────────────────────────────────────────────
+   Use inset box-shadow instead of outline — outline bleeds outside the cell
+   and ignores overflow:hidden, making paths appear to cross walls.
+   box-shadow inset stays strictly within the cell boundary.                  */
 
+/* A* — deep red, bright inner ring */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  outline: 2px solid #93c5fd;
-  outline-offset: -2px;
-  border-color: #1e40af;
+  box-shadow: inset 0 0 0 2px rgba(255, 200, 200, 0.6);
+  border-color: var(--red-dark);
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
+/* Dijkstra — slightly darker red, same treatment */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  outline: 2px solid #fed7aa;
-  outline-offset: -2px;
-  border-color: #9a3412;
+  box-shadow: inset 0 0 0 2px rgba(255, 180, 180, 0.5);
+  border-color: #7a0000;
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
+/* Greedy — mid red with lighter ring */
 .pathGreedy {
   background-color: var(--greedy-path) !important;
-  outline: 2px solid #ddd6fe;
-  outline-offset: -2px;
-  border-color: #4c1d95;
+  box-shadow: inset 0 0 0 2px rgba(255, 160, 160, 0.45);
+  border-color: #900000;
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
+/* Shared by 2+ — brightest red */
 .pathShared {
-  background-color: #b45309 !important;
-  outline: 2px solid #fef08a;
-  outline-offset: -2px;
-  border-color: #92400e;
+  background-color: var(--red) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 210, 210, 0.7);
+  border-color: var(--red-dark);
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
@@ -111,8 +114,9 @@
   100% { opacity: 1; }
 }
 
+/* Scale only goes up to 1 — never exceeds cell size, never bleeds into neighbors */
 @keyframes pathStamp {
-  0%   { transform: scale(0.7); opacity: 0.6; }
+  0%   { transform: scale(0.5); opacity: 0.4; }
   100% { transform: scale(1);   opacity: 1;   }
 }
 

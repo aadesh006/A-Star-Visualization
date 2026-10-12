@@ -28,9 +28,9 @@
 }
 .headerCell:last-child { border-right: none; }
 
-.astarHeader    { color: #93c5fd; }   /* light blue on black header */
-.dijkstraHeader { color: #fed7aa; }   /* light orange on black header */
-.greedyHeader   { color: #ddd6fe; }   /* light violet on black header */
+.astarHeader    { color: #fca5a5; }   /* light red — A* */
+.dijkstraHeader { color: #fed7aa; }   /* light orange — matches Dijkstra wash */
+.greedyHeader   { color: #ddd6fe; }   /* light violet — matches Greedy wash */
 
 /* ─── Row cells ─────────────────────────────────────────────────────────────── */
 .rowLabel {

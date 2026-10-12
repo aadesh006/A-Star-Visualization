@@ -25,20 +25,21 @@
   --red-muted:    rgba(232, 25, 10, 0.12);
 
   /* ── Algorithm visualization colors ──
-     Visited washes are bold enough to clearly show exploration area.
-     Paths are fully saturated — the most important visual element.   */
+     All paths use red — the app's signature accent color.
+     Visited washes stay distinct (blue/orange/violet) so you can tell
+     which algorithm explored which area before the paths appear.     */
 
-  /* A* — electric blue */
-  --astar-visited:    rgba(37, 99, 235, 0.30);
-  --astar-path:       #1d4ed8;
+  /* A* — red path, blue visited wash */
+  --astar-visited:    rgba(37, 99, 235, 0.28);
+  --astar-path:       #e8190a;   /* full red */
 
-  /* Dijkstra — vivid orange */
-  --dijkstra-visited: rgba(234, 88, 12, 0.28);
-  --dijkstra-path:    #c2410c;
+  /* Dijkstra — darker red path, orange visited wash */
+  --dijkstra-visited: rgba(234, 88, 12, 0.25);
+  --dijkstra-path:    #aa1008;   /* darker red — distinct from A* */
 
-  /* Greedy — vivid violet */
-  --greedy-visited:   rgba(124, 58, 237, 0.22);
-  --greedy-path:      #6d28d9;
+  /* Greedy — darkest red path, violet visited wash */
+  --greedy-visited:   rgba(124, 58, 237, 0.20);
+  --greedy-path:      #7a0a04;   /* deep burgundy-red */
 
   /* ── Node states ── */
   --node-empty:   #f5f5f0;
