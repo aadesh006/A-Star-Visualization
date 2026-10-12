@@ -1,0 +1,30 @@
+/* ─── App Shell ─────────────────────────────────────────────────────────────── */
+.app {
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ─── Main content area (grid + stats) ─────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ─── Grid area — fills remaining space ─────────────────────────────────────── */
+.gridArea {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* Make the grid fill available space while preserving cell aspect ratio */
+.gridArea > * {
+  width: 100%;
+}

@@ -1,0 +1,151 @@
+/* ─── Stats Bar ─────────────────────────────────────────────────────────────── */
+.statsBar {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Stat Card ─────────────────────────────────────────────────────────────── */
+.card {
+  flex: 1;
+  background: var(--bg-panel);
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Subtle left accent line to visually connect card to its algorithm color */
+.astar {
+  border-left: 2px solid var(--astar-primary);
+}
+
+.dijkstra {
+  border-right: 2px solid var(--dijkstra-primary);
+  border-left: none;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.algoName {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.astar .algoName  { color: var(--astar-primary);    }
+.dijkstra .algoName { color: var(--dijkstra-primary); }
+
+.badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.badgeFound {
+  background: rgba(67, 214, 117, 0.12);
+  color: var(--node-start);
+  border: 1px solid rgba(67, 214, 117, 0.25);
+}
+
+.badgeNotFound {
+  background: rgba(255, 94, 122, 0.12);
+  color: var(--node-end);
+  border: 1px solid rgba(255, 94, 122, 0.25);
+}
+
+/* ─── Metrics ───────────────────────────────────────────────────────────────── */
+.metrics {
+  display: flex;
+  gap: 24px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metricLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.metricValue {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  transition: color 0.2s;
+}
+
+/* Pulse animation while algorithm is still running */
+.metricRunning {
+  animation: countPulse 0.4s ease;
+  color: var(--accent);
+}
+
+@keyframes countPulse {
+  0%   { opacity: 0.5; }
+  100% { opacity: 1;   }
+}
+
+/* ─── Compare Column ────────────────────────────────────────────────────────── */
+.compareCol {
+  width: 160px;
+  min-width: 160px;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px;
+  text-align: center;
+}
+
+.compareLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.compareValue {
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+}
+
+.compareWarning {
+  font-size: 10px;
+  color: var(--dijkstra-primary);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.compareNote {
+  font-size: 11px;
+  color: var(--node-start);
+}
+
+.comparePlaceholder {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}

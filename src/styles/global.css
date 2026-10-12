@@ -1,0 +1,89 @@
+/* ─── Reset & Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Map-inspired terrain palette */
+  --bg-primary:       #0f1117;
+  --bg-secondary:     #161b27;
+  --bg-panel:         #1a2035;
+  --bg-card:          #1e2640;
+  --border:           #2a3550;
+  --border-light:     #334166;
+
+  /* Text */
+  --text-primary:     #e8eaf6;
+  --text-secondary:   #8892b0;
+  --text-muted:       #4a5580;
+
+  /* Accent */
+  --accent:           #5b8dee;
+  --accent-hover:     #7aa3f5;
+  --accent-glow:      rgba(91, 141, 238, 0.2);
+
+  /* Algorithm colors */
+  --astar-primary:    #5b8dee;
+  --astar-visited:    rgba(91, 141, 238, 0.25);
+  --astar-frontier:   rgba(91, 141, 238, 0.55);
+  --astar-path:       #5b8dee;
+
+  --dijkstra-primary: #f0a84a;
+  --dijkstra-visited: rgba(240, 168, 74, 0.22);
+  --dijkstra-frontier:rgba(240, 168, 74, 0.50);
+  --dijkstra-path:    #f0a84a;
+
+  /* Node states */
+  --node-empty:       #1a2035;
+  --node-wall:        #0a0e18;
+  --node-start:       #43d675;
+  --node-end:         #ff5e7a;
+
+  /* Grid lines — subtle topographic feel */
+  --grid-line:        rgba(42, 53, 80, 0.8);
+
+  /* Elevation-like terrain shading */
+  --terrain-1:        #1a2035;
+  --terrain-2:        #1c2238;
+  --terrain-3:        #1e243c;
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+
+  --font-sans:  'Inter', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* ─── Utility ───────────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0;
+}
