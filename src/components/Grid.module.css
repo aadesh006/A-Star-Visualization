@@ -5,22 +5,19 @@
   overflow: hidden;
   border: 1px solid var(--border);
   box-shadow:
-    0 0 0 1px var(--border),
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255,255,255,0.04);
+    0 0 0 1px var(--border-light),
+    0 24px 64px rgba(0, 0, 0, 0.55);
   background: var(--node-empty);
   user-select: none;
 }
 
-/* Faint topographic contour overlay — gives map depth without being distracting */
+/* Subtle vignette overlay — pulls focus toward the center of the grid */
 .mapOverlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  background-image:
-    radial-gradient(ellipse at 20% 30%, rgba(91,141,238,0.03) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 70%, rgba(240,168,74,0.03) 0%, transparent 60%);
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(6, 12, 24, 0.35) 100%);
 }
 
 /* ─── Grid Layout ───────────────────────────────────────────────────────────── */
@@ -39,109 +36,119 @@
   border-right: 1px solid var(--grid-line);
   border-bottom: 1px solid var(--grid-line);
   transition:
-    background-color 0.08s ease,
-    transform 0.06s ease,
-    box-shadow 0.08s ease;
+    background-color 0.07s ease,
+    box-shadow 0.07s ease;
   position: relative;
 }
 
 .cell:hover {
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: rgba(255, 255, 255, 0.09);
 }
 
 /* ─── Node States ───────────────────────────────────────────────────────────── */
 
 .wall {
   background-color: var(--node-wall) !important;
-  border-color: #070a12;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.5);
+  border-color: #020408;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6);
 }
 
-/* Start node — green pin feel */
+/* Start — emerald glow */
 .start {
   background-color: var(--node-start) !important;
-  border-color: rgba(67, 214, 117, 0.3);
+  border-color: rgba(52, 211, 153, 0.4);
   box-shadow:
-    inset 0 0 6px rgba(67, 214, 117, 0.3),
-    0 0 8px rgba(67, 214, 117, 0.4);
-  z-index: 1;
+    inset 0 0 8px rgba(52, 211, 153, 0.35),
+    0 0 10px rgba(52, 211, 153, 0.45);
+  z-index: 3;
 }
 
-/* End node — red pin feel */
+/* End — red glow */
 .end {
   background-color: var(--node-end) !important;
-  border-color: rgba(255, 94, 122, 0.3);
+  border-color: rgba(248, 113, 113, 0.4);
   box-shadow:
-    inset 0 0 6px rgba(255, 94, 122, 0.3),
-    0 0 8px rgba(255, 94, 122, 0.4);
-  z-index: 1;
+    inset 0 0 8px rgba(248, 113, 113, 0.35),
+    0 0 10px rgba(248, 113, 113, 0.45);
+  z-index: 3;
 }
 
 /* ─── Algorithm Visualization States ───────────────────────────────────────── */
 
-/* Frontier (open set) — lighter ring hinting nodes are being considered */
+/* Frontier — nodes being considered, faint glow */
 .frontier {
-  background-color: rgba(100, 120, 180, 0.15);
+  background-color: rgba(99, 102, 241, 0.12);
 }
 
-/* A* visited — cool blue wash */
+/* A* visited — rich cyan wash, clearly visible */
 .visitedAstar {
   background-color: var(--astar-visited);
-  animation: visitAstar 0.3s ease forwards;
+  animation: visitAstar 0.25s ease forwards;
 }
 
-/* Dijkstra visited — warm amber wash */
+/* Dijkstra visited — rich amber wash */
 .visitedDijkstra {
   background-color: var(--dijkstra-visited);
-  animation: visitDijkstra 0.3s ease forwards;
+  animation: visitDijkstra 0.25s ease forwards;
 }
 
-/* Both visited — blended purple-ish */
+/* Both visited — violet blend */
 .visitedBoth {
-  background-color: rgba(165, 100, 160, 0.3);
+  background-color: rgba(180, 100, 200, 0.38);
 }
 
-/* A* path — bright blue line */
+/* ─── Path States — bold, bright, unmissable ─────────────────────────────── */
+
+/* A* path — solid bright cyan */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  box-shadow: 0 0 6px rgba(91, 141, 238, 0.6);
-  animation: pathPulse 0.4s ease forwards;
-  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.5),
+    0 0 10px rgba(34, 211, 238, 0.7),
+    inset 0 0 6px rgba(255, 255, 255, 0.2);
+  animation: pathAppear 0.35s ease forwards;
+  z-index: 2;
 }
 
-/* Dijkstra path — amber line */
+/* Dijkstra path — solid bright orange */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  box-shadow: 0 0 6px rgba(240, 168, 74, 0.6);
-  animation: pathPulse 0.4s ease forwards;
-  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(251, 146, 60, 0.5),
+    0 0 10px rgba(251, 146, 60, 0.7),
+    inset 0 0 6px rgba(255, 255, 255, 0.2);
+  animation: pathAppear 0.35s ease forwards;
+  z-index: 2;
 }
 
-/* Overlapping paths — white/light highlight to show they match */
+/* Shared path — bright white-yellow where both algorithms agree */
 .pathBoth {
-  background-color: #c8d8ff !important;
-  box-shadow: 0 0 8px rgba(200, 216, 255, 0.7);
-  animation: pathPulse 0.4s ease forwards;
-  z-index: 1;
+  background-color: #fde68a !important;
+  box-shadow:
+    0 0 0 1px rgba(253, 230, 138, 0.6),
+    0 0 12px rgba(253, 230, 138, 0.8),
+    inset 0 0 6px rgba(255, 255, 255, 0.3);
+  animation: pathAppear 0.35s ease forwards;
+  z-index: 2;
 }
 
 /* ─── Animations ────────────────────────────────────────────────────────────── */
 
 @keyframes visitAstar {
-  0%   { transform: scale(0.3); background-color: rgba(91,141,238,0.7); }
-  50%  { transform: scale(1.1); }
+  0%   { transform: scale(0.2); background-color: rgba(34, 211, 238, 0.9); }
+  55%  { transform: scale(1.12); }
   100% { transform: scale(1);   background-color: var(--astar-visited); }
 }
 
 @keyframes visitDijkstra {
-  0%   { transform: scale(0.3); background-color: rgba(240,168,74,0.7); }
-  50%  { transform: scale(1.1); }
+  0%   { transform: scale(0.2); background-color: rgba(251, 146, 60, 0.9); }
+  55%  { transform: scale(1.12); }
   100% { transform: scale(1);   background-color: var(--dijkstra-visited); }
 }
 
-@keyframes pathPulse {
-  0%   { transform: scale(0.6); opacity: 0.5; }
-  60%  { transform: scale(1.15); }
+@keyframes pathAppear {
+  0%   { transform: scale(0.5); opacity: 0.3; }
+  65%  { transform: scale(1.2); opacity: 1; }
   100% { transform: scale(1);   opacity: 1; }
 }
 
@@ -154,7 +161,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  opacity: 0.25;
+  opacity: 0.2;
   pointer-events: none;
   z-index: 3;
   font-family: var(--font-mono);

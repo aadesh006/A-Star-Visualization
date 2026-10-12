@@ -1,9 +1,9 @@
 /* ─── Panel Shell ───────────────────────────────────────────────────────────── */
 .panel {
-  width: 280px;
-  min-width: 280px;
+  width: 100%;        /* fills whatever wrapper width App.jsx sets */
+  height: 100%;
   background: var(--bg-panel);
-  border-right: 1px solid var(--border);
+  border-right: none; /* border is now on the resize handle side */
   display: flex;
   flex-direction: column;
   gap: 0;

@@ -4,6 +4,45 @@
   height: 100dvh;
   overflow: hidden;
   background: var(--bg-primary);
+  /* Prevent text selection while dragging the resize handle */
+  user-select: none;
+}
+
+/* ─── Resize Handle ─────────────────────────────────────────────────────────── */
+/* The thin draggable strip between sidebar and grid */
+.resizeHandle {
+  width: 4px;
+  min-width: 4px;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  position: relative;
+  transition: background 0.15s;
+  z-index: 10;
+}
+
+.resizeHandle:hover,
+.resizeHandle:active {
+  background: var(--accent);
+}
+
+/* Visual affordance dot in the middle of the handle */
+.resizeHandle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 32px;
+  border-radius: 2px;
+  background: var(--border-light);
+  transition: background 0.15s;
+}
+
+.resizeHandle:hover::after {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 /* ─── Main content area (grid + stats) ─────────────────────────────────────── */
@@ -24,7 +63,6 @@
   overflow: hidden;
 }
 
-/* Make the grid fill available space while preserving cell aspect ratio */
 .gridArea > * {
   width: 100%;
 }

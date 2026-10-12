@@ -6,48 +6,46 @@
 }
 
 :root {
-  /* Map-inspired terrain palette */
-  --bg-primary:       #0f1117;
-  --bg-secondary:     #161b27;
-  --bg-panel:         #1a2035;
-  --bg-card:          #1e2640;
-  --border:           #2a3550;
-  --border-light:     #334166;
+  /* Slate/navy base — dark but not pitch black, easier on the eyes */
+  --bg-primary:       #111827;
+  --bg-secondary:     #1a2336;
+  --bg-panel:         #0f172a;
+  --bg-card:          #1e293b;
+  --border:           #2d3f5c;
+  --border-light:     #3d5070;
 
   /* Text */
-  --text-primary:     #e8eaf6;
-  --text-secondary:   #8892b0;
-  --text-muted:       #4a5580;
+  --text-primary:     #f1f5f9;
+  --text-secondary:   #94a3b8;
+  --text-muted:       #4a5a74;
 
-  /* Accent */
-  --accent:           #5b8dee;
-  --accent-hover:     #7aa3f5;
-  --accent-glow:      rgba(91, 141, 238, 0.2);
+  /* Accent — indigo */
+  --accent:           #6366f1;
+  --accent-hover:     #818cf8;
+  --accent-glow:      rgba(99, 102, 241, 0.22);
 
-  /* Algorithm colors */
-  --astar-primary:    #5b8dee;
-  --astar-visited:    rgba(91, 141, 238, 0.25);
-  --astar-frontier:   rgba(91, 141, 238, 0.55);
-  --astar-path:       #5b8dee;
+  /* ── A* — vivid cyan ──────────────────────────────────────────────────────
+     High contrast against the dark grid; explored area is clearly visible   */
+  --astar-primary:    #22d3ee;
+  --astar-visited:    rgba(34, 211, 238, 0.38);
+  --astar-frontier:   rgba(34, 211, 238, 0.65);
+  --astar-path:       #22d3ee;
 
-  --dijkstra-primary: #f0a84a;
-  --dijkstra-visited: rgba(240, 168, 74, 0.22);
-  --dijkstra-frontier:rgba(240, 168, 74, 0.50);
-  --dijkstra-path:    #f0a84a;
+  /* ── Dijkstra — vivid amber/orange ───────────────────────────────────────
+     Warm counterpart to A*'s cool cyan; clearly distinct at a glance        */
+  --dijkstra-primary: #fb923c;
+  --dijkstra-visited: rgba(251, 146, 60, 0.35);
+  --dijkstra-frontier:rgba(251, 146, 60, 0.60);
+  --dijkstra-path:    #fb923c;
 
   /* Node states */
-  --node-empty:       #1a2035;
-  --node-wall:        #0a0e18;
-  --node-start:       #43d675;
-  --node-end:         #ff5e7a;
+  --node-empty:       #1a2744;   /* slightly blue-tinted so the grid looks like a map */
+  --node-wall:        #060c18;   /* near-black, high contrast with empty */
+  --node-start:       #34d399;   /* emerald green */
+  --node-end:         #f87171;   /* soft red */
 
-  /* Grid lines — subtle topographic feel */
-  --grid-line:        rgba(42, 53, 80, 0.8);
-
-  /* Elevation-like terrain shading */
-  --terrain-1:        #1a2035;
-  --terrain-2:        #1c2238;
-  --terrain-3:        #1e243c;
+  /* Grid lines */
+  --grid-line:        rgba(45, 63, 92, 0.9);
 
   --radius-sm:  6px;
   --radius-md:  10px;

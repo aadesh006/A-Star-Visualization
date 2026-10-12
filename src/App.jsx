@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import Grid from './components/Grid';
 import Controls from './components/Controls';
 import Stats from './components/Stats';
@@ -35,7 +35,33 @@ export default function App() {
   const [speed,        setSpeed]        = useState(1);
   const [interactMode, setInteractMode] = useState('wall');
 
-  // ── Animation state ──
+  // ── Sidebar resize ──
+  // Drag the handle between panel and grid to resize the sidebar.
+  const [sidebarWidth, setSidebarWidth] = useState(280);
+  const isResizing = useRef(false);
+
+  const handleResizeStart = useCallback((e) => {
+    isResizing.current = true;
+    e.preventDefault();
+  }, []);
+
+  useEffect(() => {
+    function onMouseMove(e) {
+      if (!isResizing.current) return;
+      // Clamp between 220px and 420px so the sidebar stays usable
+      const newWidth = Math.min(420, Math.max(220, e.clientX));
+      setSidebarWidth(newWidth);
+    }
+    function onMouseUp() {
+      isResizing.current = false;
+    }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
   const [isRunning, setIsRunning] = useState(false);
   const [hasRun,    setHasRun]    = useState(false);
   const animRef     = useRef(null); // stores the timeout handle so we can cancel
@@ -260,16 +286,26 @@ export default function App() {
 
   return (
     <div className={styles.app}>
-      <Controls
-        heuristic={heuristic}       setHeuristic={setHeuristic}
-        weight={weight}             setWeight={setWeight}
-        speed={speed}               setSpeed={setSpeed}
-        interactMode={interactMode} setInteractMode={setInteractMode}
-        isRunning={isRunning}
-        onRun={handleRun}
-        onReset={handleReset}
-        onMaze={handleMaze}
-        onClear={handleClearAll}
+      {/* Sidebar with dynamic width set via inline style */}
+      <div style={{ width: sidebarWidth, minWidth: sidebarWidth, flexShrink: 0 }}>
+        <Controls
+          heuristic={heuristic}       setHeuristic={setHeuristic}
+          weight={weight}             setWeight={setWeight}
+          speed={speed}               setSpeed={setSpeed}
+          interactMode={interactMode} setInteractMode={setInteractMode}
+          isRunning={isRunning}
+          onRun={handleRun}
+          onReset={handleReset}
+          onMaze={handleMaze}
+          onClear={handleClearAll}
+        />
+      </div>
+
+      {/* Drag handle — the thin strip between sidebar and grid */}
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={handleResizeStart}
+        title="Drag to resize sidebar"
       />
 
       <main className={styles.main}>

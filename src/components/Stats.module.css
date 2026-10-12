@@ -19,11 +19,11 @@
 
 /* Subtle left accent line to visually connect card to its algorithm color */
 .astar {
-  border-left: 2px solid var(--astar-primary);
+  border-left: 3px solid var(--astar-primary);
 }
 
 .dijkstra {
-  border-right: 2px solid var(--dijkstra-primary);
+  border-right: 3px solid var(--dijkstra-primary);
   border-left: none;
 }
 
