@@ -205,6 +205,12 @@ export default function App() {
     const maxVisitFrames = Math.max(astarResult.frames.length, dijkstraResult.frames.length);
     let tick = 0;
 
+    // Pre-count visit frames per algorithm so live counter tracks independently
+    const astarVisitCount    = astarResult.frames.filter(f => f.type === 'visit').length;
+    const dijkstraVisitCount = dijkstraResult.frames.filter(f => f.type === 'visit').length;
+    let astarVisited    = 0;
+    let dijkstraVisited = 0;
+
     // Working copy — mutated incrementally during animation
     let animGrid = cloneGrid(baseGrid);
 
@@ -217,22 +223,23 @@ export default function App() {
         animGrid = animGrid.map(r => r.map(n => ({ ...n, astar: {...n.astar}, dijkstra: {...n.dijkstra} })));
 
         if (aFrame) {
-          if (aFrame.type === 'visit')    animGrid[aFrame.row][aFrame.col].astar.visited    = true;
+          if (aFrame.type === 'visit')    { animGrid[aFrame.row][aFrame.col].astar.visited    = true; astarVisited++; }
           if (aFrame.type === 'frontier') animGrid[aFrame.row][aFrame.col].astar.inFrontier = true;
         }
         if (dFrame) {
-          if (dFrame.type === 'visit')    animGrid[dFrame.row][dFrame.col].dijkstra.visited    = true;
+          if (dFrame.type === 'visit')    { animGrid[dFrame.row][dFrame.col].dijkstra.visited    = true; dijkstraVisited++; }
           if (dFrame.type === 'frontier') animGrid[dFrame.row][dFrame.col].dijkstra.inFrontier = true;
         }
 
-        // Live node counts while animating
+        // Each algorithm's counter advances independently — A* finishing early
+        // doesn't freeze the Dijkstra counter and vice versa
         setAstarStats({
-          nodesExplored: Math.min(tick + 1, astarResult.frames.filter(f => f.type === 'visit').length),
+          nodesExplored: Math.min(astarVisited, astarVisitCount),
           pathLength: 0,
           found: false,
         });
         setDijkstraStats({
-          nodesExplored: Math.min(tick + 1, dijkstraResult.frames.filter(f => f.type === 'visit').length),
+          nodesExplored: Math.min(dijkstraVisited, dijkstraVisitCount),
           pathLength: 0,
           found: false,
         });

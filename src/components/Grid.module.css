@@ -27,6 +27,7 @@
   border-right: 1px solid var(--grid-line);
   border-bottom: 1px solid var(--grid-line);
   transition: background-color 0.06s ease;
+  position: relative; /* required for z-index to work on path/start/end cells */
 }
 
 .cell:hover {
@@ -45,12 +46,14 @@
 .start {
   background-color: var(--node-start) !important;
   border-color: #003a9a;
+  z-index: 3;
 }
 
 /* End — red block */
 .end {
   background-color: var(--node-end) !important;
   border-color: var(--red-dark);
+  z-index: 3;
 }
 
 /* ─── Algorithm Visualization States ───────────────────────────────────────── */
@@ -77,13 +80,14 @@
   background-color: rgba(120, 0, 160, 0.2);
 }
 
-/* ─── Path States — solid, full-opacity, clearly legible ───────────────────── */
+/* ─── Path States — sit above visited wash via z-index ─────────────────────── */
 
-/* A* path — solid deep blue, 2px top border as a stripe accent */
+/* A* path — solid deep blue */
 .pathAstar {
   background-color: var(--astar-path) !important;
   border-color: #002a8a;
   border-top: 2px solid #7ab0ff;
+  z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
@@ -92,14 +96,16 @@
   background-color: var(--dijkstra-path) !important;
   border-color: #8a0000;
   border-top: 2px solid #ff8070;
+  z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
-/* Shared path — solid black with a white top stripe */
+/* Shared path — purple so it's distinct from both blue and red */
 .pathBoth {
-  background-color: var(--fg) !important;
-  border-color: #000;
-  border-top: 2px solid #aaa;
+  background-color: #7c3aed !important;
+  border-color: #5b21b6;
+  border-top: 2px solid #c4b5fd;
+  z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
