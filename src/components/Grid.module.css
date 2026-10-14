@@ -71,39 +71,39 @@
    and ignores overflow:hidden, making paths appear to cross walls.
    box-shadow inset stays strictly within the cell boundary.                  */
 
-/* A* — deep red, bright inner ring */
+/* A* — amber gold */
 .pathAstar {
   background-color: var(--astar-path) !important;
-  box-shadow: inset 0 0 0 2px rgba(255, 200, 200, 0.6);
-  border-color: var(--red-dark);
+  box-shadow: inset 0 0 0 2px var(--astar-path-ring);
+  border-color: var(--astar-path-border);
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
-/* Dijkstra — slightly darker red, same treatment */
+/* Dijkstra — teal cyan */
 .pathDijkstra {
   background-color: var(--dijkstra-path) !important;
-  box-shadow: inset 0 0 0 2px rgba(255, 180, 180, 0.5);
-  border-color: #7a0000;
+  box-shadow: inset 0 0 0 2px var(--dijkstra-path-ring);
+  border-color: var(--dijkstra-path-border);
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
-/* Greedy — mid red with lighter ring */
+/* Greedy — hot magenta */
 .pathGreedy {
   background-color: var(--greedy-path) !important;
-  box-shadow: inset 0 0 0 2px rgba(255, 160, 160, 0.45);
-  border-color: #900000;
+  box-shadow: inset 0 0 0 2px var(--greedy-path-ring);
+  border-color: var(--greedy-path-border);
   z-index: 2;
   animation: pathStamp 0.2s ease forwards;
 }
 
-/* Shared by 2+ — brightest red */
+/* Shared by 2+ — bright white highlight so overlap stands out */
 .pathShared {
-  background-color: var(--red) !important;
-  box-shadow: inset 0 0 0 2px rgba(255, 210, 210, 0.7);
-  border-color: var(--red-dark);
-  z-index: 2;
+  background-color: #ffffff !important;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.25);
+  border-color: #888888;
+  z-index: 3;
   animation: pathStamp 0.2s ease forwards;
 }
 

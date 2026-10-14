@@ -57,6 +57,10 @@ export default function App() {
   const animRef      = useRef(null);  // current timeout handle
   const stepQueueRef = useRef(null);  // holds { frames, tick, animGrid, ... } when paused
 
+  // ── isPaused ref mirror — readable inside timeout closures without stale value ──
+  const isPausedRef = useRef(false);
+  useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
+
   // ─── Sidebar resize handlers ───────────────────────────────────────────────
 
   const handleResizeStart = useCallback(e => {
@@ -107,13 +111,14 @@ export default function App() {
 
   function cancelAnimation() {
     if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
-    stepQueueRef.current = null;
+    // NOTE: do NOT null stepQueueRef here — pause needs to keep it alive
   }
 
   // ─── Reset / Clear ─────────────────────────────────────────────────────────
 
   const handleReset = useCallback(() => {
-    cancelAnimation();
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
+    stepQueueRef.current = null;
     astarScoreMap.current = {};
     setGrid(prev => prev.map(row => row.map(node => ({
       ...node,
@@ -126,7 +131,8 @@ export default function App() {
   }, []);
 
   const handleClearAll = useCallback(() => {
-    cancelAnimation();
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
+    stepQueueRef.current = null;
     astarScoreMap.current = {};
     setGrid(createGrid(startPos, endPos));
     setAstarStats(null); setDijkstraStats(null); setGreedyStats(null);
@@ -134,40 +140,146 @@ export default function App() {
   }, [startPos, endPos]);
 
   const handleMaze = useCallback(() => {
-    cancelAnimation();
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
+    stepQueueRef.current = null;
     setHasRun(false);
     setAstarStats(null); setDijkstraStats(null); setGreedyStats(null);
     setGrid(prev => generateMaze(prev, startPos, endPos));
   }, [startPos, endPos]);
 
+  // ─── Animation step functions — stored in refs so callbacks never go stale ─
+  //
+  // The core insight: useCallback memoizes the function reference, so any plain
+  // function it closes over gets frozen at the time of memoization. Storing
+  // advanceOneFrame and continueStep in refs means every caller always reads the
+  // latest version via `.current()`, sidestepping the stale closure entirely.
+
+  const advanceOneFrameRef = useRef(null);
+  const continueStepRef    = useRef(null);
+
+  // Defined as a ref-stored function so Resume/Step/timeout all share one live copy
+  advanceOneFrameRef.current = function advanceOneFrame(queue) {
+    if (queue.phase === 'visit') {
+      if (queue.tick < queue.maxVisit) {
+        const { astarResult, dijkstraResult, greedyResult } = queue;
+        const aFrame = astarResult.frames[queue.tick];
+        const dFrame = dijkstraResult.frames[queue.tick];
+        const gFrame = greedyResult?.frames[queue.tick];
+
+        const newGrid = queue.animGrid.map(r => r.map(n => ({
+          ...n,
+          astar:    { ...n.astar },
+          dijkstra: { ...n.dijkstra },
+          greedy:   { ...n.greedy },
+        })));
+
+        if (aFrame) {
+          if (aFrame.type === 'visit')    { newGrid[aFrame.row][aFrame.col].astar.visited    = true; queue.aVisited++; }
+          if (aFrame.type === 'frontier')   newGrid[aFrame.row][aFrame.col].astar.inFrontier = true;
+        }
+        if (dFrame) {
+          if (dFrame.type === 'visit')    { newGrid[dFrame.row][dFrame.col].dijkstra.visited    = true; queue.dVisited++; }
+          if (dFrame.type === 'frontier')   newGrid[dFrame.row][dFrame.col].dijkstra.inFrontier = true;
+        }
+        if (gFrame) {
+          if (gFrame.type === 'visit')    { newGrid[gFrame.row][gFrame.col].greedy.visited    = true; queue.gVisited++; }
+          if (gFrame.type === 'frontier')   newGrid[gFrame.row][gFrame.col].greedy.inFrontier = true;
+        }
+
+        queue.animGrid = newGrid;
+        queue.tick++;
+
+        setGrid(newGrid);
+        setAstarStats({    nodesExplored: Math.min(queue.aVisited, queue.aVisitTotal), pathLength: 0, found: false });
+        setDijkstraStats({ nodesExplored: Math.min(queue.dVisited, queue.dVisitTotal), pathLength: 0, found: false });
+        if (greedyResult) setGreedyStats({ nodesExplored: Math.min(queue.gVisited, queue.gVisitTotal), pathLength: 0, found: false });
+
+      } else {
+        // Visit phase done — flip to path phase
+        queue.phase   = 'path';
+        queue.tick    = 0;
+        queue.maxPath = Math.max(
+          queue.astarResult.pathFrames.length,
+          queue.dijkstraResult.pathFrames.length,
+          queue.greedyResult?.pathFrames.length ?? 0
+        );
+        // Immediately consume the first path frame so STEP doesn't appear to stall
+        advanceOneFrameRef.current(queue);
+      }
+
+    } else if (queue.phase === 'path') {
+      const { astarResult, dijkstraResult, greedyResult } = queue;
+      if (queue.tick < queue.maxPath) {
+        const aFrame = astarResult.pathFrames[queue.tick];
+        const dFrame = dijkstraResult.pathFrames[queue.tick];
+        const gFrame = greedyResult?.pathFrames[queue.tick];
+
+        const newGrid = queue.animGrid.map(r => r.map(n => ({
+          ...n,
+          astar:    { ...n.astar },
+          dijkstra: { ...n.dijkstra },
+          greedy:   { ...n.greedy },
+        })));
+
+        if (aFrame) newGrid[aFrame.row][aFrame.col].astar.inPath    = true;
+        if (dFrame) newGrid[dFrame.row][dFrame.col].dijkstra.inPath = true;
+        if (gFrame) newGrid[gFrame.row][gFrame.col].greedy.inPath   = true;
+
+        queue.animGrid = newGrid;
+        queue.tick++;
+        setGrid(newGrid);
+
+      } else {
+        // Animation complete
+        setAstarStats(astarResult.stats);
+        setDijkstraStats(dijkstraResult.stats);
+        if (greedyResult) setGreedyStats(greedyResult.stats);
+        setHasRun(true);
+        setIsRunning(false);
+        setIsPaused(false);
+        stepQueueRef.current = null;
+        animRef.current = null;
+      }
+    }
+  };
+
+  continueStepRef.current = function continueStep(queue, delay) {
+    advanceOneFrameRef.current(queue);
+    if (stepQueueRef.current && !isPausedRef.current) {
+      animRef.current = setTimeout(() => continueStepRef.current(queue, delay), delay);
+    }
+  };
+
   // ─── Pause / Resume ────────────────────────────────────────────────────────
 
   const handlePause = useCallback(() => {
     if (!isRunning || isPaused) return;
-    cancelAnimation();        // stop the timeout loop
-    setIsPaused(true);        // stepQueueRef still holds the queue position
+    // Stop the timeout loop but leave stepQueueRef intact so Resume can continue
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
+    setIsPaused(true);
   }, [isRunning, isPaused]);
 
   const handleResume = useCallback(() => {
     if (!isPaused || !stepQueueRef.current) return;
     setIsPaused(false);
-    // Restart the step loop from where it left off
     const delay = SPEED_DELAYS[speed];
-    animRef.current = setTimeout(() => continueStep(stepQueueRef.current, delay), delay);
+    // Small timeout so isPausedRef flips to false before the loop checks it
+    animRef.current = setTimeout(() => continueStepRef.current(stepQueueRef.current, delay), delay);
   }, [isPaused, speed]);
 
   // ─── Step Forward (one frame at a time) ────────────────────────────────────
 
   const handleStepForward = useCallback(() => {
     if (!isPaused || !stepQueueRef.current) return;
-    advanceOneFrame(stepQueueRef.current);
+    advanceOneFrameRef.current(stepQueueRef.current);
   }, [isPaused]);
 
   // ─── Main Run ──────────────────────────────────────────────────────────────
 
   const handleRun = useCallback(() => {
     if (isRunning) return;
-    cancelAnimation();
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
+    stepQueueRef.current = null;
 
     // Strip old visualization state from grid
     const baseGrid = grid.map(row => row.map(node => ({
@@ -214,125 +326,23 @@ export default function App() {
       greedyResult?.frames.length ?? 0
     );
 
-    // Per-algorithm visit counters for independent live stats
-    let aVisited = 0, dVisited = 0, gVisited = 0;
     const aVisitTotal = astarResult.frames.filter(f => f.type === 'visit').length;
     const dVisitTotal = dijkstraResult.frames.filter(f => f.type === 'visit').length;
     const gVisitTotal = greedyResult ? greedyResult.frames.filter(f => f.type === 'visit').length : 0;
 
     const queue = {
-      phase: 'visit',         // 'visit' | 'path'
+      phase: 'visit',
       tick: 0,
       maxVisit,
       astarResult, dijkstraResult, greedyResult,
       animGrid: cloneGrid(baseGrid),
-      aVisited, dVisited, gVisited,
+      aVisited: 0, dVisited: 0, gVisited: 0,
       aVisitTotal, dVisitTotal, gVisitTotal,
     };
 
     stepQueueRef.current = queue;
-    animRef.current = setTimeout(() => continueStep(queue, delay), delay);
+    animRef.current = setTimeout(() => continueStepRef.current(queue, delay), delay);
   }, [grid, startPos, endPos, heuristic, weight, speed, showGreedy, isRunning]);
-
-  // ─── Animation step loop ───────────────────────────────────────────────────
-  // continueStep and advanceOneFrame are plain functions (not hooks) because
-  // they only read from refs and call setters — no stale closure issues.
-
-  function continueStep(queue, delay) {
-    advanceOneFrame(queue);
-    if (stepQueueRef.current && !isPausedRef.current) {
-      animRef.current = setTimeout(() => continueStep(queue, delay), delay);
-    }
-  }
-
-  // We need a ref mirror of isPaused to read inside the timeout closure
-  const isPausedRef = useRef(false);
-  useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
-
-  function advanceOneFrame(queue) {
-    if (queue.phase === 'visit') {
-      if (queue.tick < queue.maxVisit) {
-        const { astarResult, dijkstraResult, greedyResult } = queue;
-        const aFrame = astarResult.frames[queue.tick];
-        const dFrame = dijkstraResult.frames[queue.tick];
-        const gFrame = greedyResult?.frames[queue.tick];
-
-        const newGrid = queue.animGrid.map(r => r.map(n => ({
-          ...n,
-          astar:    { ...n.astar },
-          dijkstra: { ...n.dijkstra },
-          greedy:   { ...n.greedy },
-        })));
-
-        if (aFrame) {
-          if (aFrame.type === 'visit')    { newGrid[aFrame.row][aFrame.col].astar.visited    = true; queue.aVisited++; }
-          if (aFrame.type === 'frontier')   newGrid[aFrame.row][aFrame.col].astar.inFrontier = true;
-        }
-        if (dFrame) {
-          if (dFrame.type === 'visit')    { newGrid[dFrame.row][dFrame.col].dijkstra.visited    = true; queue.dVisited++; }
-          if (dFrame.type === 'frontier')   newGrid[dFrame.row][dFrame.col].dijkstra.inFrontier = true;
-        }
-        if (gFrame) {
-          if (gFrame.type === 'visit')    { newGrid[gFrame.row][gFrame.col].greedy.visited    = true; queue.gVisited++; }
-          if (gFrame.type === 'frontier')   newGrid[gFrame.row][gFrame.col].greedy.inFrontier = true;
-        }
-
-        queue.animGrid = newGrid;
-        queue.tick++;
-
-        setGrid(newGrid);
-        setAstarStats({    nodesExplored: Math.min(queue.aVisited, queue.aVisitTotal), pathLength: 0, found: false });
-        setDijkstraStats({ nodesExplored: Math.min(queue.dVisited, queue.dVisitTotal), pathLength: 0, found: false });
-        if (greedyResult) setGreedyStats({ nodesExplored: Math.min(queue.gVisited, queue.gVisitTotal), pathLength: 0, found: false });
-
-      } else {
-        // Visit phase done — flip to path phase and immediately run first path frame
-        // so STEP button doesn't appear to do nothing at the boundary
-        queue.phase = 'path';
-        queue.tick  = 0;
-        queue.maxPath = Math.max(
-          queue.astarResult.pathFrames.length,
-          queue.dijkstraResult.pathFrames.length,
-          queue.greedyResult?.pathFrames.length ?? 0
-        );
-        // Recurse once to consume the first path frame immediately
-        advanceOneFrame(queue);
-      }
-    } else if (queue.phase === 'path') {
-      const { astarResult, dijkstraResult, greedyResult } = queue;
-      if (queue.tick < queue.maxPath) {
-        const aFrame = astarResult.pathFrames[queue.tick];
-        const dFrame = dijkstraResult.pathFrames[queue.tick];
-        const gFrame = greedyResult?.pathFrames[queue.tick];
-
-        const newGrid = queue.animGrid.map(r => r.map(n => ({
-          ...n,
-          astar:    { ...n.astar },
-          dijkstra: { ...n.dijkstra },
-          greedy:   { ...n.greedy },
-        })));
-
-        if (aFrame) newGrid[aFrame.row][aFrame.col].astar.inPath    = true;
-        if (dFrame) newGrid[dFrame.row][dFrame.col].dijkstra.inPath = true;
-        if (gFrame) newGrid[gFrame.row][gFrame.col].greedy.inPath   = true;
-
-        queue.animGrid = newGrid;
-        queue.tick++;
-        setGrid(newGrid);
-
-      } else {
-        // Animation complete
-        setAstarStats(astarResult.stats);
-        setDijkstraStats(dijkstraResult.stats);
-        if (greedyResult) setGreedyStats(greedyResult.stats);
-        setHasRun(true);
-        setIsRunning(false);
-        setIsPaused(false);
-        stepQueueRef.current = null;
-        animRef.current = null;
-      }
-    }
-  }
 
   // ─── Render ────────────────────────────────────────────────────────────────
 

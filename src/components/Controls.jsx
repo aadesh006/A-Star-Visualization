@@ -70,6 +70,12 @@ export default function Controls({
       {/* ── Algorithms toggle ── */}
       <section className={styles.section}>
         <div className={styles.sectionLabel}>ALGORITHMS</div>
+        {/* Column headers for the two swatches */}
+        <div className={styles.algoLegendHeader}>
+          <span className={styles.algoLegendSpacer} />
+          <span className={styles.algoLegendCol}>visited</span>
+          <span className={styles.algoLegendCol}>path</span>
+        </div>
         <div className={styles.algoList}>
           <AlgoTag color="astar"    label="A*"           active />
           <AlgoTag color="dijkstra" label="Dijkstra"     active />
@@ -210,8 +216,12 @@ function AlgoTag({ color, label, active, onClick, toggle }) {
       disabled={!toggle}
       title={toggle ? (active ? 'Click to hide Greedy' : 'Click to show Greedy') : undefined}
     >
-      <span className={styles.algoTagDot} />
-      {label}
+      {/* Two swatches: visited wash color + final path color */}
+      <span className={styles.swatchGroup}>
+        <span className={`${styles.swatch} ${styles[`swatch_${color}_visited`]}`} title="visited area color" />
+        <span className={`${styles.swatch} ${styles[`swatch_${color}_path`]}`}    title="final path color" />
+      </span>
+      <span className={styles.algoTagName}>{label}</span>
       {toggle && <span className={styles.algoTagBadge}>{active ? 'ON' : 'OFF'}</span>}
     </button>
   );

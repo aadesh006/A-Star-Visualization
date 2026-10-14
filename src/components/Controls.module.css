@@ -102,6 +102,20 @@
   display: flex; flex-direction: column; gap: 4px;
 }
 
+/* Small column headers above the swatch columns */
+.algoLegendHeader {
+  display: flex; align-items: center;
+  padding: 0 10px;
+  gap: 4px;
+}
+.algoLegendSpacer { flex: 1; }
+.algoLegendCol {
+  width: 34px; text-align: center;
+  font-family: var(--font-mono); font-size: 8px;
+  letter-spacing: 0.08em; color: var(--fg-faint);
+  text-transform: uppercase;
+}
+
 .algoTag {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 10px;
@@ -117,20 +131,34 @@
 
 .algoTagActive { border-color: var(--border); color: var(--fg); }
 
-.algoTagDot {
-  width: 8px; height: 8px;
-  border-radius: 0; /* square dots — brutalist */
+.algoTagName { flex: 1; text-align: left; }
+
+/* Two side-by-side swatches: visited wash + path color */
+.swatchGroup {
+  display: flex; gap: 3px; flex-shrink: 0;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 1px solid rgba(0,0,0,0.15);
   flex-shrink: 0;
 }
 
-/* Dot colors match visited wash colors so sidebar is visually consistent with grid */
-.algo_astar    .algoTagDot { background: #2563eb; }   /* blue wash */
-.algo_dijkstra .algoTagDot { background: #ea580c; }   /* orange wash */
-.algo_greedy   .algoTagDot { background: #7c3aed; }   /* violet wash */
+/* Visited wash swatches — semi-transparent fills */
+.swatch_astar_visited    { background: rgba(37,  99, 235, 0.55); }
+.swatch_dijkstra_visited { background: rgba(234, 88,  12, 0.55); }
+.swatch_greedy_visited   { background: rgba(124, 58, 237, 0.55); }
 
-.algo_astar.algoTagActive    { border-left: 3px solid #2563eb; }
-.algo_dijkstra.algoTagActive { border-left: 3px solid #ea580c; }
-.algo_greedy.algoTagActive   { border-left: 3px solid #7c3aed; }
+/* Path color swatches — solid, match the grid path cells exactly */
+.swatch_astar_path    { background: #f5a800; }   /* amber gold */
+.swatch_dijkstra_path { background: #00c8b8; }   /* teal cyan */
+.swatch_greedy_path   { background: #e8198a; }   /* hot magenta */
+
+/* Active border accent on left edge — uses path color */
+.algo_astar.algoTagActive    { border-left: 3px solid #f5a800; }
+.algo_dijkstra.algoTagActive { border-left: 3px solid #00c8b8; }
+.algo_greedy.algoTagActive   { border-left: 3px solid #e8198a; }
 
 .algoTagBadge {
   margin-left: auto;
