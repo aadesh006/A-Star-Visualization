@@ -1,6 +1,6 @@
 // ─── Grid Constants ────────────────────────────────────────────────────────────
 
-export const ROWS = 28;
+export const ROWS = 26;
 export const COLS = 56;
 
 // Node type identifiers

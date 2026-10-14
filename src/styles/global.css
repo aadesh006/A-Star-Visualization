@@ -25,21 +25,27 @@
   --red-muted:    rgba(232, 25, 10, 0.12);
 
   /* ── Algorithm visualization colors ──
-     All paths use red — the app's signature accent color.
-     Visited washes stay distinct (blue/orange/violet) so you can tell
-     which algorithm explored which area before the paths appear.     */
+     Each algorithm gets a unique, bold path color so paths are immediately
+     distinguishable even when they overlap.
+     Visited washes are softer tints of the same hue family.           */
 
-  /* A* — red path, blue visited wash */
+  /* A* — gold/amber path, blue visited wash */
   --astar-visited:    rgba(37, 99, 235, 0.28);
-  --astar-path:       #e8190a;   /* full red */
+  --astar-path:       #f5a800;   /* amber gold */
+  --astar-path-ring:  rgba(255, 235, 160, 0.7);
+  --astar-path-border:#b87800;
 
-  /* Dijkstra — darker red path, orange visited wash */
+  /* Dijkstra — cyan/teal path, orange visited wash */
   --dijkstra-visited: rgba(234, 88, 12, 0.25);
-  --dijkstra-path:    #aa1008;   /* darker red — distinct from A* */
+  --dijkstra-path:    #00c8b8;   /* teal cyan */
+  --dijkstra-path-ring:  rgba(160, 255, 245, 0.6);
+  --dijkstra-path-border:#008c80;
 
-  /* Greedy — darkest red path, violet visited wash */
+  /* Greedy — magenta/pink path, violet visited wash */
   --greedy-visited:   rgba(124, 58, 237, 0.20);
-  --greedy-path:      #7a0a04;   /* deep burgundy-red */
+  --greedy-path:      #e8198a;   /* hot magenta */
+  --greedy-path-ring: rgba(255, 180, 230, 0.6);
+  --greedy-path-border:#a0006a;
 
   /* ── Node states ── */
   --node-empty:   #f5f5f0;

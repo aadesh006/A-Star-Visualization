@@ -28,9 +28,9 @@
 }
 .headerCell:last-child { border-right: none; }
 
-.astarHeader    { color: #fca5a5; }   /* light red — A* */
-.dijkstraHeader { color: #fed7aa; }   /* light orange — matches Dijkstra wash */
-.greedyHeader   { color: #ddd6fe; }   /* light violet — matches Greedy wash */
+.astarHeader    { color: #fde68a; }   /* amber gold — matches A* path */
+.dijkstraHeader { color: #99f6e4; }   /* teal cyan — matches Dijkstra path */
+.greedyHeader   { color: #f9a8d4; }   /* hot pink — matches Greedy path */
 
 /* ─── Row cells ─────────────────────────────────────────────────────────────── */
 .rowLabel {
@@ -47,10 +47,10 @@
   border-right: 1px solid var(--border-light);
 }
 
-/* Subtle per-algorithm column tints */
-.astarVal    { background: rgba(0,  64, 184, 0.06); }
-.dijkstraVal { background: rgba(204, 24,  0, 0.06); }
-.greedyVal   { background: rgba(0,  140, 60, 0.06); }
+/* Subtle per-algorithm column tints — tinted to match each path color */
+.astarVal    { background: rgba(245, 168,   0, 0.08); }   /* amber gold tint */
+.dijkstraVal { background: rgba(  0, 200, 184, 0.08); }   /* teal cyan tint */
+.greedyVal   { background: rgba(232,  25, 138, 0.08); }   /* magenta tint */
 
 .rowDiff {
   padding: 7px 12px;
